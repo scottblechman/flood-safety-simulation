@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D29EEBF1206040EB00C72DD2 /* Chunk.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29EEBF0206040EB00C72DD2 /* Chunk.swift */; };
 		D2E29E38204660440009946E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E29E37204660440009946E /* AppDelegate.swift */; };
 		D2E29E3A204660440009946E /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = D2E29E39204660440009946E /* art.scnassets */; };
 		D2E29E3C204660440009946E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E29E3B204660440009946E /* ViewController.swift */; };
@@ -27,6 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D29EEBF0206040EB00C72DD2 /* Chunk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chunk.swift; sourceTree = "<group>"; };
 		D2E29E34204660440009946E /* Flood Safety Simulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Flood Safety Simulator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2E29E37204660440009946E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D2E29E39204660440009946E /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
@@ -58,6 +60,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D29EEBEF206040CD00C72DD2 /* model */ = {
+			isa = PBXGroup;
+			children = (
+				D29EEBF0206040EB00C72DD2 /* Chunk.swift */,
+			);
+			path = model;
+			sourceTree = "<group>";
+		};
 		D2E29E2B204660440009946E = {
 			isa = PBXGroup;
 			children = (
@@ -79,6 +89,7 @@
 		D2E29E36204660440009946E /* Flood Safety Simulator */ = {
 			isa = PBXGroup;
 			children = (
+				D29EEBEF206040CD00C72DD2 /* model */,
 				D2E29E37204660440009946E /* AppDelegate.swift */,
 				D2E29E39204660440009946E /* art.scnassets */,
 				D2E29E3B204660440009946E /* ViewController.swift */,
@@ -205,6 +216,7 @@
 			files = (
 				D2E29E3C204660440009946E /* ViewController.swift in Sources */,
 				D2E29E38204660440009946E /* AppDelegate.swift in Sources */,
+				D29EEBF1206040EB00C72DD2 /* Chunk.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

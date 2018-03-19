@@ -20,11 +20,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Set the view's delegate
         sceneView.delegate = self
         
-        // Show statistics such as fps and timing information
-        sceneView.showsStatistics = true
+        // Do not statistics fps and timing info
+        sceneView.showsStatistics = false
         
         // Create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.scn")!
+        let scene = SCNScene(named: "art.scnassets/scene2.scn")!
+        
+        
+        //let cubeNode = SCNNode(geometry: SCNBox(width: 0.1, height: 0.01, length: 0.1, chamferRadius: 0))
+        //cubeNode.position = SCNVector3(0, -1, -0.2) // SceneKit/AR coordinates are in meters
+        //scene.rootNode.addChildNode(cubeNode)
         
         // Set the scene to the view
         sceneView.scene = scene
@@ -35,6 +40,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
+        
+        
+        configuration.planeDetection = .horizontal
 
         // Run the view's session
         sceneView.session.run(configuration)
@@ -54,14 +62,30 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
     // MARK: - ARSCNViewDelegate
     
-/*
+
     // Override to create and configure nodes for anchors added to the view's session.
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
         let node = SCNNode()
      
+        // This visualization covers only detected planes.
+        guard let planeAnchor = anchor as? ARPlaneAnchor else { return nil }
+        
+        // Create a SceneKit plane to visualize the node using its position and extent.
+        //let plane = SCNPlane(width: CGFloat(planeAnchor.extent.x), height: CGFloat(planeAnchor.extent.z))
+        //let planeNode = SCNNode(geometry: plane)
+        let planeNode = SCNNode(geometry: SCNBox(width: 0.1, height: 0.01, length: 0.1, chamferRadius: 0))
+        planeNode.position = SCNVector3Make(planeAnchor.center.x, 0, planeAnchor.center.z)
+        
+        // SCNPlanes are vertically oriented in their local coordinate space.
+        // Rotate it to match the horizontal orientation of the ARPlaneAnchor.
+        //planeNode.transform = SCNMatrix4MakeRotation(-Float.pi / 2, 1, 0, 0)
+        
+        // ARKit owns the node corresponding to the anchor, so make the plane a child node.
+        node.addChildNode(planeNode)
+        
         return node
     }
-*/
+
     
     func session(_ session: ARSession, didFailWithError error: Error) {
         // Present an error message to the user
