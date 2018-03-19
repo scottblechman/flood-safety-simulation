@@ -6,6 +6,6 @@
 import Foundation
 import SceneKit
 
-class Chunk: SCNScene{
+class Chunk: SCNNode{
     
 }
