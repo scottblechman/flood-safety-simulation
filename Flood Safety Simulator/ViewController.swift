@@ -6,19 +6,18 @@
 import UIKit
 import SceneKit
 import ARKit
+
 import CoreLocation
 
 class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtocol {
 
-    
     @IBOutlet var sceneView: ARSCNView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Connect location updates
-        let locationProvider = LocationProvider.Provider
-        locationProvider.delegate = self
+        LocationProvider.Provider.delegate = self
         
         // Set the view's delegate
         sceneView.delegate = self
@@ -84,9 +83,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         
     }
     
-    func locationDidUpdateToLocation(location: CLLocation) {
-        let currentLocation = location
-        print("Latitude : \(currentLocation.coordinate.latitude)")
-        print("Longitude : \(currentLocation.coordinate.longitude)")
+    func locationUpdated(location: CLLocation) {
+        
     }
 }

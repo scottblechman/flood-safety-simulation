@@ -6,6 +6,10 @@
 import Foundation
 import CoreLocation
 
+protocol LocationUpdateProtocol {
+    func locationUpdated(location : CLLocation)
+}
+
 class LocationProvider: NSObject, CLLocationManagerDelegate {
     
     static let Provider = LocationProvider()
@@ -16,7 +20,6 @@ class LocationProvider: NSObject, CLLocationManagerDelegate {
     var delegate: LocationUpdateProtocol!
     
     override init() {
-        print("Initializing location manager")
         super.init()
         
         self.locationManager.delegate = self
@@ -34,7 +37,6 @@ class LocationProvider: NSObject, CLLocationManagerDelegate {
             break
             
         case .authorizedWhenInUse, .authorizedAlways:
-            print("Authorized to enable location")
             // Enable location features
             startLocationUpdates()
             break
@@ -42,21 +44,13 @@ class LocationProvider: NSObject, CLLocationManagerDelegate {
     }
     
     func startLocationUpdates() {
-        // Slightly redundant; this method is only called when authorized
-        let authorizationStatus = CLLocationManager.authorizationStatus()
-        if authorizationStatus != .authorizedWhenInUse && authorizationStatus != .authorizedAlways {
-            // User has not authorized access to location information.
-            return
-        }
-        
-        // Do not start services that aren't available.
+        // Check before calling location manager that services are enabled on device.
         if !CLLocationManager.locationServicesEnabled() {
             // Location services is not available.
             return
         }
         
         // Configure and start the service.
-        print("Starting location updates")
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         locationManager.distanceFilter = 100.0  // In meters.
         locationManager.startUpdatingLocation()
@@ -66,16 +60,10 @@ class LocationProvider: NSObject, CLLocationManagerDelegate {
         locationManager.stopUpdatingLocation()
     }
     
-    /*func locationManager(manager: CLLocationManager, didUpdateToLocation newLocation: CLLocation, fromLocation oldLocation: CLLocation) {
-        print("Updated location in LocationProvider")
-        //location = newLocation
-        delegate.locationDidUpdateToLocation(location: newLocation)
-    }*/
     func locationManager(_ manager: CLLocationManager,
                          didUpdateLocations locations: [CLLocation])
     {
-        print("Updated location in LocationProvider")
         let latestLocation: CLLocation = locations[locations.count - 1]
-        delegate.locationDidUpdateToLocation(location: latestLocation)
+        delegate.locationUpdated(location: latestLocation)
     }
 }

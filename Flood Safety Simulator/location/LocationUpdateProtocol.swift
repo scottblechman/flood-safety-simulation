@@ -4,6 +4,4 @@
 
 import CoreLocation
 
-protocol LocationUpdateProtocol {
-    func locationDidUpdateToLocation(location : CLLocation)
-}
+

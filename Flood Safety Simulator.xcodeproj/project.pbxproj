@@ -10,7 +10,6 @@
 		D29EEBF1206040EB00C72DD2 /* Chunk.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29EEBF0206040EB00C72DD2 /* Chunk.swift */; };
 		D29EEBF32060582300C72DD2 /* ChunkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29EEBF22060582300C72DD2 /* ChunkManager.swift */; };
 		D29EEBF62060640400C72DD2 /* LocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29EEBF52060640400C72DD2 /* LocationProvider.swift */; };
-		D29EEBFA20617A3400C72DD2 /* LocationUpdateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29EEBF920617A3400C72DD2 /* LocationUpdateProtocol.swift */; };
 		D2E29E38204660440009946E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E29E37204660440009946E /* AppDelegate.swift */; };
 		D2E29E3A204660440009946E /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = D2E29E39204660440009946E /* art.scnassets */; };
 		D2E29E3C204660440009946E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E29E3B204660440009946E /* ViewController.swift */; };
@@ -34,7 +33,6 @@
 		D29EEBF0206040EB00C72DD2 /* Chunk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chunk.swift; sourceTree = "<group>"; };
 		D29EEBF22060582300C72DD2 /* ChunkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkManager.swift; sourceTree = "<group>"; };
 		D29EEBF52060640400C72DD2 /* LocationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationProvider.swift; sourceTree = "<group>"; };
-		D29EEBF920617A3400C72DD2 /* LocationUpdateProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationUpdateProtocol.swift; sourceTree = "<group>"; };
 		D2E29E34204660440009946E /* Flood Safety Simulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Flood Safety Simulator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2E29E37204660440009946E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D2E29E39204660440009946E /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
@@ -79,7 +77,6 @@
 			isa = PBXGroup;
 			children = (
 				D29EEBF52060640400C72DD2 /* LocationProvider.swift */,
-				D29EEBF920617A3400C72DD2 /* LocationUpdateProtocol.swift */,
 			);
 			path = location;
 			sourceTree = "<group>";
@@ -232,7 +229,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D2E29E3C204660440009946E /* ViewController.swift in Sources */,
-				D29EEBFA20617A3400C72DD2 /* LocationUpdateProtocol.swift in Sources */,
 				D29EEBF32060582300C72DD2 /* ChunkManager.swift in Sources */,
 				D2E29E38204660440009946E /* AppDelegate.swift in Sources */,
 				D29EEBF1206040EB00C72DD2 /* Chunk.swift in Sources */,
