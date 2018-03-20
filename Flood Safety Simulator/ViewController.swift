@@ -1,9 +1,6 @@
 //
-//  ViewController.swift
-//  Flood Safety Simulator
-//
-//  Created by Scott Blechman on 2/27/18.
-//  Copyright © 2018 Scott Blechman. All rights reserved.
+//  Responsible for rendering game state with ARKit and SceneKit, as well as coordinating model class
+//  connections.
 //
 
 import UIKit
@@ -20,11 +17,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Set the view's delegate
         sceneView.delegate = self
         
-        // Show statistics such as fps and timing information
-        sceneView.showsStatistics = true
+        // Do not show statistics, fps, or timing info
+        sceneView.showsStatistics = false
         
         // Create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.scn")!
+        let scene = SCNScene(named: "art.scnassets/world.scn")!
         
         // Set the scene to the view
         sceneView.scene = scene
@@ -35,6 +32,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
+        
+        // Enable plane detection
+        configuration.planeDetection = .horizontal
 
         // Run the view's session
         sceneView.session.run(configuration)
@@ -54,14 +54,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 
     // MARK: - ARSCNViewDelegate
     
-/*
+
     // Override to create and configure nodes for anchors added to the view's session.
     func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
         let node = SCNNode()
-     
+        
         return node
     }
-*/
+
     
     func session(_ session: ARSession, didFailWithError error: Error) {
         // Present an error message to the user
