@@ -6,13 +6,19 @@
 import UIKit
 import SceneKit
 import ARKit
+import CoreLocation
 
-class ViewController: UIViewController, ARSCNViewDelegate {
+class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtocol {
 
+    
     @IBOutlet var sceneView: ARSCNView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Connect location updates
+        let locationProvider = LocationProvider.Provider
+        locationProvider.delegate = self
         
         // Set the view's delegate
         sceneView.delegate = self
@@ -76,5 +82,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     func sessionInterruptionEnded(_ session: ARSession) {
         // Reset tracking and/or remove existing anchors if consistent tracking is required
         
+    }
+    
+    func locationDidUpdateToLocation(location: CLLocation) {
+        let currentLocation = location
+        print("Latitude : \(currentLocation.coordinate.latitude)")
+        print("Longitude : \(currentLocation.coordinate.longitude)")
     }
 }
