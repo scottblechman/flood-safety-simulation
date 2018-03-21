@@ -13,6 +13,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
 
     @IBOutlet var sceneView: ARSCNView!
     
+    // Holds reference IDs for the terrain chunks that should be in memory
+    var chunkList = [Chunk]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -84,6 +87,10 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     }
     
     func locationUpdated(location: CLLocation) {
+        // Do any chunk updating required at the new location
+        let latitude = location.coordinate.latitude
+        let longitude = location.coordinate.longitude
         
+        chunkList = ChunkManager.Manager.synchronize(latitude, longitude)
     }
 }

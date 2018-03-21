@@ -18,8 +18,8 @@ class Chunk: SCNNode{
     // determined in a different way in the ViewController
     var anchor: Bool
     
-    // For the moment, represent geometry as a flat plane to continue developing other components
-    var chunkGeometry: SCNPlane
+    // Chunk IDs follow the format "chunk_x_y"
+    var chunkId: String
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -30,10 +30,9 @@ class Chunk: SCNNode{
         self.gridX = x
         self.gridY = y
         self.anchor = anchor
-        self.chunkGeometry = SCNPlane(width: CGFloat(CHUNK_BOUNDARY), height: CGFloat(CHUNK_BOUNDARY))
+        self.chunkId = "\(x)_\(y)"
         
         // Class data associated with SCNNode must be declared following super method
         super.init()
-        self.geometry = chunkGeometry
     }
 }
