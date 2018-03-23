@@ -1,44 +1,30 @@
 //
-//  Responsible for synchronizing the list of currently required chunks with the ViewController.
-//  Uses the current location obtained from the ViewController to recognize which chunks are
-//  around the user, and either loads, retains, or unloads chunks to supply the list.
+//  Responsible for determining, based on the provided device location, which chunks of the
+//  overall terrain model should be active or inactive.
 //
 
 import Foundation
 
+// Common information also required by Chunk model for geographic positioning
+let CHUNKS_X: Double = 7
+let CHUNKS_Y: Double = 7
+
+let FACE_NORTH = 33.58829
+let FACE_SOUTH = 33.57808
+let FACE_EAST = -101.8706
+let FACE_WEST = -101.8815
+
+//increment between chunks on the x-axis
+let INCREMENT_X = abs(FACE_EAST - FACE_WEST) / CHUNKS_X
+//increment between chunks on the y-axis
+let INCREMENT_Y = abs(FACE_NORTH - FACE_SOUTH) / CHUNKS_Y
+
 class ChunkManager {
-    
-    var FACE_NORTH: Double
-    var FACE_SOUTH: Double
-    var FACE_EAST: Double
-    var FACE_WEST: Double
-    
-    var INCREMENT_X: Double
-    var INCREMENT_Y: Double
-    
-    var CHUNKS_X: Double
-    var CHUNKS_Y: Double
-    
     static let Manager = ChunkManager()
     
     var chunkList = [Chunk]()
     
-    init() {
-        CHUNKS_X = 7
-        CHUNKS_Y = 7
-        
-        FACE_NORTH = 33.58829
-        FACE_SOUTH = 33.57808
-        FACE_EAST = -101.8706
-        FACE_WEST = -101.8815
-        
-        //increment between chunks on the x-axis
-        INCREMENT_X = abs(FACE_EAST - FACE_WEST) / CHUNKS_X
-        //increment between chunks on the y-axis
-        INCREMENT_Y = abs(FACE_NORTH - FACE_SOUTH) / CHUNKS_Y
-    }
-    
-    func synchronize(_ latitude: Double, _ longitude: Double) -> Array<Chunk> {
+    func update(_ latitude: Double, _ longitude: Double) -> Array<Chunk> {
         //1. Take location and return world grid coordinate
         let position: (Int, Int)
         position.0 = Int(floor((latitude-FACE_WEST)/INCREMENT_X))
