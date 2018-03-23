@@ -7,12 +7,17 @@ import UIKit
 import SceneKit
 import ARKit
 
-class ViewController: UIViewController, ARSCNViewDelegate {
+import CoreLocation
+
+class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtocol {
 
     @IBOutlet var sceneView: ARSCNView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Connect location updates
+        LocationProvider.Provider.delegate = self
         
         // Set the view's delegate
         sceneView.delegate = self
@@ -75,6 +80,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     func sessionInterruptionEnded(_ session: ARSession) {
         // Reset tracking and/or remove existing anchors if consistent tracking is required
+        
+    }
+    
+    func locationUpdated(location: CLLocation) {
         
     }
 }

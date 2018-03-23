@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		D29EEBF1206040EB00C72DD2 /* Chunk.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29EEBF0206040EB00C72DD2 /* Chunk.swift */; };
 		D29EEBF32060582300C72DD2 /* ChunkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29EEBF22060582300C72DD2 /* ChunkManager.swift */; };
+		D29EEBF62060640400C72DD2 /* LocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29EEBF52060640400C72DD2 /* LocationProvider.swift */; };
 		D2E29E38204660440009946E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E29E37204660440009946E /* AppDelegate.swift */; };
 		D2E29E3A204660440009946E /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = D2E29E39204660440009946E /* art.scnassets */; };
 		D2E29E3C204660440009946E /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E29E3B204660440009946E /* ViewController.swift */; };
@@ -31,6 +32,7 @@
 /* Begin PBXFileReference section */
 		D29EEBF0206040EB00C72DD2 /* Chunk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chunk.swift; sourceTree = "<group>"; };
 		D29EEBF22060582300C72DD2 /* ChunkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkManager.swift; sourceTree = "<group>"; };
+		D29EEBF52060640400C72DD2 /* LocationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationProvider.swift; sourceTree = "<group>"; };
 		D2E29E34204660440009946E /* Flood Safety Simulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Flood Safety Simulator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D2E29E37204660440009946E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D2E29E39204660440009946E /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
@@ -71,6 +73,14 @@
 			path = model;
 			sourceTree = "<group>";
 		};
+		D29EEBF4206063F700C72DD2 /* location */ = {
+			isa = PBXGroup;
+			children = (
+				D29EEBF52060640400C72DD2 /* LocationProvider.swift */,
+			);
+			path = location;
+			sourceTree = "<group>";
+		};
 		D2E29E2B204660440009946E = {
 			isa = PBXGroup;
 			children = (
@@ -92,6 +102,7 @@
 		D2E29E36204660440009946E /* Flood Safety Simulator */ = {
 			isa = PBXGroup;
 			children = (
+				D29EEBF4206063F700C72DD2 /* location */,
 				D29EEBEF206040CD00C72DD2 /* model */,
 				D2E29E37204660440009946E /* AppDelegate.swift */,
 				D2E29E39204660440009946E /* art.scnassets */,
@@ -221,6 +232,7 @@
 				D29EEBF32060582300C72DD2 /* ChunkManager.swift in Sources */,
 				D2E29E38204660440009946E /* AppDelegate.swift in Sources */,
 				D29EEBF1206040EB00C72DD2 /* Chunk.swift in Sources */,
+				D29EEBF62060640400C72DD2 /* LocationProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
