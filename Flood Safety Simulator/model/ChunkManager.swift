@@ -7,7 +7,7 @@ import Foundation
 
 // Common information also required by Chunk model for geographic positioning
 let CHUNKS_X: Double = 7
-let CHUNKS_Y: Double = 7
+let CHUNKS_Z: Double = 7
 
 let FACE_NORTH = 33.58829
 let FACE_SOUTH = 33.57808
@@ -16,8 +16,11 @@ let FACE_WEST = -101.8815
 
 //increment between chunks on the x-axis
 let INCREMENT_X = abs(FACE_EAST - FACE_WEST) / CHUNKS_X
-//increment between chunks on the y-axis
-let INCREMENT_Y = abs(FACE_NORTH - FACE_SOUTH) / CHUNKS_Y
+//increment between chunks on the z-axis
+let INCREMENT_Z = abs(FACE_NORTH - FACE_SOUTH) / CHUNKS_Z
+
+// External list of elevation points (in m) at the (0, 0) of each chunk
+let Y_POINTS = [[Double]]()
 
 class ChunkManager {
     static let Manager = ChunkManager()
@@ -28,7 +31,7 @@ class ChunkManager {
         //1. Take location and return world grid coordinate
         let position: (Int, Int)
         position.0 = Int(floor((latitude-FACE_WEST)/INCREMENT_X))
-        position.1 = Int(CHUNKS_Y) - Int(floor((longitude-FACE_NORTH)/INCREMENT_Y))
+        position.1 = Int(CHUNKS_Z) - Int(floor((longitude-FACE_NORTH)/INCREMENT_Z))
         
         //2. Take world grid coordinate and return coordinate + surrounding coordinates
         let coordinateList = coordinateListFrom(position)

@@ -72,11 +72,11 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     
 
     // Override to create and configure nodes for anchors added to the view's session.
-    func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
+    /*func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
         let node = SCNNode()
         
         return node
-    }
+    }*/
 
     
     func session(_ session: ARSession, didFailWithError error: Error) {
@@ -118,10 +118,15 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         let translationX = vectorTo(tail: self.location!.coordinate, head: translationPointX)
         let translationZ = vectorTo(tail: self.location!.coordinate, head: translationPointZ)
         
+        // Determine the elevation for each chunk by determining its anchor elevation
+        // to the current elevation
+        let elevationZero = -self.location!.altitude
+        let translationY = elevationZero + chunk.anchorElevation
+        
         let cubeNode = SCNNode(geometry: SCNBox(width: 0.3, height: 0.3, length: 0.3, chamferRadius: 0))
         
         // SceneKit/AR coordinates are in meters
-        cubeNode.position = SCNVector3(translationX, 0.0, translationZ)
+        cubeNode.position = SCNVector3(translationX, translationY, translationZ)
         scene.rootNode.addChildNode(cubeNode)
     }
     
