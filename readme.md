@@ -45,4 +45,25 @@ I exported these chunks individually as collada and ply models. Each chunk was n
 The elevation model represents an area of approximately 0.7x0.7 miles (3696x3696 ft). To create an even amount of sections, this area is divided into 49 chunks of 528 sq. ft. When the environment is created, the device location is used to calculate the corresponding chunk along with any bordering chunks. Location is checked periodically (about twice a minute, the average time to run across a chunk), to coordinate loading and unloading of models.
 
 ### Logic of the Game 
-In a round, simulated water will rise to a final level higher than the initial elevation of the user. The user will have two minutes to determine what may be a safe location and arrive there. The score is calculated in two steps: an initial maximum score calculated using the final elevation, and points subtracted from entering dangerous situations (calculated using time spent in water greater than 6 inches above the elevation model, as well as any extra height of the water).
+#### Objective
+The objective of the player is to reach a safe location by the end of the simulation and place themselves in the least danger while doing so. Players will receive a numerical final score to reflect how well they achieved these goals. A score of greater than [determine a good score here] indicates that they took minimal risks while reaching safety.
+
+### Division of Labor
+#### Fox
+- Create Elevation Model
+  - Obtain GIS data for Texas Tech Campus
+  - Create heightmap image
+  - Create meshes from height map for use in ARKit
+- Design Game Logic
+  - Design scoring system
+  - Write pseudocode for gameplay loop
+
+#### Scott
+- Create AR Environment
+  - Set up AR play area on Texas Tech Campus
+  - Make system to track user location and elevation
+  - Create system to track active elevation model chunks
+  - Render water level in real time
+- Implement Gameplay
+  - Create menus and transitions to and from gameplay
+  - Implement gameplay logic from pseudocode
