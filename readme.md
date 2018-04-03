@@ -53,12 +53,9 @@ Players begin with 120 points. On each game tick (approximately every 5 seconds?
 | Water Level | Points Deducted |
 | ----------- | --------------- |
 | 0" - .9"    | 0               |
-| ----------- | --------------- |
 | 1" - 2.9"   | 1               |
-| ----------- | --------------- |
 | 3.3" - 5.9" | 5               |
-| ----------- | --------------- |
-| 6" +        | 20              |
+| 6+"         | 20              |
 
 #### Main Gameplay Loop
 ```
