@@ -69,7 +69,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     }
 
     // MARK: - ARSCNViewDelegate
-    
 
     // Override to create and configure nodes for anchors added to the view's session.
     /*func renderer(_ renderer: SCNSceneRenderer, nodeFor anchor: ARAnchor) -> SCNNode? {
@@ -103,7 +102,10 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         let latitude = location.coordinate.latitude
         let longitude = location.coordinate.longitude
         
+        print("Updated location to \(latitude), \(longitude)")
+        
         let newChunkList = ChunkManager.Manager.update(latitude, longitude)
+        print("Got new chunks")
         synchronize(old: self.chunkList, new: newChunkList)
     }
     
@@ -128,6 +130,10 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         // SceneKit/AR coordinates are in meters
         cubeNode.position = SCNVector3(translationX, translationY, translationZ)
         scene.rootNode.addChildNode(cubeNode)
+    }
+    
+    func removeChunkGeometry(_ scene: SCNScene, _ chunk: Chunk) {
+        
     }
     
     // Provides a negative or positive distance, in meters, to translate an initial point
@@ -155,10 +161,32 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     // Compares the current standing list of active chunks to a pending updated list. Adds,
     // retains, or removes chunk geometries based on the list comparison.
     func synchronize(old: [Chunk], new: [Chunk]) {
-        if(!testRenderFlag) {
-            let chunk = Chunk(x: 0, y: 0, anchor: true)
-            addChunkGeometry(scene, chunk)
-            testRenderFlag = true
+        /*
+         temp <- new
+         for chunk in old:
+             if not equivalent in new:
+                delete geometry from scene
+             else:
+                delete chunk from new
+         for remaining chunk in new:
+            add geometry to scene
+         chunkList <- temp
+        */
+        let tempList = new
+        for oldChunk in old {
+            var match = false
+            for newChunk in new {
+                if oldChunk == newChunk {
+                    match = true
+                }
+            }
+            if !match {
+                removeChunkGeometry(scene, oldChunk)
+            }
         }
+        for chunk in new {
+            addChunkGeometry(scene, chunk)
+        }
+        chunkList = tempList
     }
 }

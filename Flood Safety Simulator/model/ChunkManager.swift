@@ -20,7 +20,7 @@ let INCREMENT_X = abs(FACE_EAST - FACE_WEST) / CHUNKS_X
 let INCREMENT_Z = abs(FACE_NORTH - FACE_SOUTH) / CHUNKS_Z
 
 // External list of elevation points (in m) at the (0, 0) of each chunk
-let Y_POINTS = [[Double]]()
+let Y_POINTS: [[Double]] = [[979.22, 979.90, 980.48, 980.65, 979.89, 979.87, 979.33], [980.01, 980.68, 981.84, 981.09, 980.73, 981.76, 979.81], [980.16, 981.04, 982.31, 981.49, 982.00, 980.86, 981.29], [980.49, 981.72, 983.14, 982.01, 981.22, 981.42, 979.76], [981.03, 981.06, 983.52, 981.72, 981.04, 981.66, 982.58], [981.82, 982.24, 982.19, 982.46, 981.36, 983.23, 981.74], [983.09, 983.34, 983.69, 982.99, 983.06, 982.86, 982.84]]
 
 class ChunkManager {
     static let Manager = ChunkManager()
