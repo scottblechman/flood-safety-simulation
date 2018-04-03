@@ -8,7 +8,6 @@
 Using Apple's ARKit, we aim to create an app that will place players in the middle of a flash flood. Their objective, will be to reach a spot safe from the flood waters while avoiding the dangers of a flash flood such as deep and rapidly moving water. Players will be scored based on their ability to reach safety while avoiding these hazards.
 
 ### Tools Used
-
 #### Apple ARKit
 ARKit modeling is used both to visualize rising flood waters and to create elevation environment data used to coordinate water models. Other iOS utilities are used, including CoreLocation to coordinate elevation model creation.
 
@@ -44,10 +43,56 @@ I exported these chunks individually as collada and ply models. Each chunk was n
 ### Creating the AR Environment
 The elevation model represents an area of approximately 0.7x0.7 miles (3696x3696 ft). To create an even amount of sections, this area is divided into 49 chunks of 528 sq. ft. When the environment is created, the device location is used to calculate the corresponding chunk along with any bordering chunks. Location is checked periodically (about twice a minute, the average time to run across a chunk), to coordinate loading and unloading of models.
 
-### Logic of the Game 
+### Gameplay Design
 #### Objective
-The objective of the player is to reach a safe location by the end of the simulation and place themselves in the least danger while doing so. Players will receive a numerical final score to reflect how well they achieved these goals. A score of greater than [determine a good score here] indicates that they took minimal risks while reaching safety.
+The objective of the player is to reach a safe location by the end of the simulation and place themselves in the least danger while doing so. Players will receive a numerical final score to reflect how well they achieved these goals. A score of greater than 100 indicates that they took minimal risks while reaching safety.
 
+#### Scoring
+Players begin with 120 points. On each game tick (approximately every 5 seconds?), we determine the water level at their location. Players will have points deducted based on the number of inches of water they are standing in. Deductions are shown in the table below:
+Water Level | Points Deducted
+----------- | ---------------
+0" - .9"    | 0
+----------- | ---------------
+ 1" - 2.9"  | 1
+----------- | ---------------
+3.3" - 5.9" | 5
+----------- | ---------------
+6" +        | 20
+
+#### Main Gameplay Loop
+'''
+var elevation
+var waterHeight
+var waterLevel
+var playerLocation
+var gameTimer
+var gameEnd
+
+While(!gameEnd){
+  playerLocation.update()
+  elevation = playerLocation.elevation()
+  waterHeight = playerLocation.waterHeight()
+  waterLevel = waterHeight - elevation
+  //scoring
+  if (waterLevel < 1)
+    score = score       //redundant but makes else ifs look nicer
+  else if (waterLevel < 3)
+    score -= 1
+  else if (waterLevel < 6)
+    score -= 5
+  else
+    score -= 20
+  //check if game end
+  if (score <= 0)
+    gameEnd = true
+  if (gameTimer >= timeLimit)
+    gameEnd = true
+
+  gameTimer += tickTime
+}
+
+score.display()
+'''
 ### Division of Labor
 #### Fox
 - Create Elevation Model
