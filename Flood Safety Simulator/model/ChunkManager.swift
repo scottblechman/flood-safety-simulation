@@ -30,8 +30,15 @@ class ChunkManager {
     func update(_ latitude: Double, _ longitude: Double) -> Array<Chunk> {
         //1. Take location and return world grid coordinate
         let position: (Int, Int)
-        position.0 = Int(floor((latitude-FACE_WEST)/INCREMENT_X))
-        position.1 = Int(CHUNKS_Z) - Int(floor((longitude-FACE_NORTH)/INCREMENT_Z))
+        //print(longitude-FACE_WEST)
+        //print((longitude-FACE_WEST)/INCREMENT_X)
+        //print(floor((longitude-FACE_WEST)/INCREMENT_X))
+        //print(Int(floor((longitude-FACE_WEST)/INCREMENT_X)))
+        
+        position.0 = Int(floor((FACE_NORTH-latitude)/INCREMENT_X))
+        position.1 = Int(CHUNKS_Z) - Int(floor((longitude-FACE_WEST)/INCREMENT_Z))
+        
+        print("Position is \(position.0), \(position.1)")
         
         //2. Take world grid coordinate and return coordinate + surrounding coordinates
         let coordinateList = coordinateListFrom(position)

@@ -111,6 +111,21 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     
     // MARK: - ARSCNViewManager
     
+    func addModelFile(world: SCNScene, chunk: Chunk, position: SCNVector3) {
+        let geometry = SCNScene(named: "art.scnassets/collada_chunks/chunk_\(chunk.gridX)_\(chunk.gridY).dae")
+        let node: SCNNode = (geometry?.rootNode.childNodes[0])!
+        node.name = "chunk_\(chunk.gridX)_\(chunk.gridY)"
+        world.rootNode.addChildNode(node)
+    }
+    
+    func removeModelFile(world: SCNScene, chunkId: String) {
+        //let geoScene = SCNScene(named: "art.scnassets/ball.dae")
+        //scene.rootNode.addChildNode(geoScene!.rootNode.childNode(withName: "Ball", recursively: true)!)
+        let node = scene.rootNode.childNode(withName: chunkId, recursively: true)
+        
+        node?.removeFromParentNode()
+    }
+    
     // Loads a model file from the terrain assets associated with the provided chunk, and
     // anchors the model in virtual space over the real-world terrain
     func addChunkGeometry(_ scene: SCNScene, _ chunk: Chunk) {
@@ -124,16 +139,15 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         // to the current elevation
         let elevationZero = -self.location!.altitude
         let translationY = elevationZero + chunk.anchorElevation
-        
-        let cubeNode = SCNNode(geometry: SCNBox(width: 0.3, height: 0.3, length: 0.3, chamferRadius: 0))
-        
+
         // SceneKit/AR coordinates are in meters
-        cubeNode.position = SCNVector3(translationX, translationY, translationZ)
-        scene.rootNode.addChildNode(cubeNode)
+        let position = SCNVector3(translationX, translationY, translationZ)
+        addModelFile(world: scene, chunk: chunk, position: position)
     }
     
     func removeChunkGeometry(_ scene: SCNScene, _ chunk: Chunk) {
-        
+        let chunkIdentifier = "chunk_\(chunk.gridX)_\(chunk.gridY)"
+        removeModelFile(world: scene, chunkId: chunkIdentifier)
     }
     
     // Provides a negative or positive distance, in meters, to translate an initial point
@@ -161,17 +175,10 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     // Compares the current standing list of active chunks to a pending updated list. Adds,
     // retains, or removes chunk geometries based on the list comparison.
     func synchronize(old: [Chunk], new: [Chunk]) {
-        /*
-         temp <- new
-         for chunk in old:
-             if not equivalent in new:
-                delete geometry from scene
-             else:
-                delete chunk from new
-         for remaining chunk in new:
-            add geometry to scene
-         chunkList <- temp
-        */
+        print("Old chunks: \(old)\nNew chunks:")
+        for chunk in new {
+            print("\(chunk.gridX), \(chunk.gridY)")
+        }
         let tempList = new
         for oldChunk in old {
             var match = false
