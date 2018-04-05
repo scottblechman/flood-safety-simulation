@@ -71,6 +71,7 @@ While(!gameEnd){
   elevation = playerLocation.elevation()
   waterHeight = playerLocation.waterHeight()
   waterLevel = waterHeight - elevation
+  waterLevel = waterLevel / 39.3701 //converts meters to inches
   //scoring
   if (waterLevel < 1)
     score = score       //redundant but makes else ifs look nicer
@@ -86,7 +87,7 @@ While(!gameEnd){
   if (gameTimer >= timeLimit)
     gameEnd = true
 
-  gameTimer += tickTime
+  gameTimer += tickTime //tickTime is approx. 5 seconds
 }
 
 score.display()
