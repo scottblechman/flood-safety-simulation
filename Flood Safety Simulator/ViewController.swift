@@ -105,7 +105,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         print("Updated location to \(latitude), \(longitude)")
         
         let newChunkList = ChunkManager.Manager.update(latitude, longitude)
-        print("Got new chunks")
         synchronize(old: self.chunkList, new: newChunkList)
     }
     
@@ -115,6 +114,18 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         let geometry = SCNScene(named: "art.scnassets/collada_chunks/chunk_\(chunk.gridX)_\(chunk.gridY).dae")
         let node: SCNNode = (geometry?.rootNode.childNodes[0])!
         node.name = "chunk_\(chunk.gridX)_\(chunk.gridY)"
+        print("Position of \(node.name) fixed to\(position.x), \(position.y), \(position.z)")
+        //node.position = position
+        
+        let xAngle = SCNMatrix4MakeRotation(Float.pi/2, 1, 0, 0)
+        let yAngle = SCNMatrix4MakeRotation(0, 0, 1, 0)
+        let zAngle = SCNMatrix4MakeRotation(0, 0, 0, 1)
+        let rotationMatrix = SCNMatrix4Mult(SCNMatrix4Mult(xAngle, yAngle), zAngle)
+        node.pivot = SCNMatrix4Mult(rotationMatrix, node.transform)
+        
+        // TODO: change scale of node to fit documentation
+        //node.scale = SCNVector3(x: 4180.0, y: 1000.0, z: 3983.42)
+        
         world.rootNode.addChildNode(node)
     }
     
@@ -175,10 +186,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     // Compares the current standing list of active chunks to a pending updated list. Adds,
     // retains, or removes chunk geometries based on the list comparison.
     func synchronize(old: [Chunk], new: [Chunk]) {
-        print("Old chunks: \(old)\nNew chunks:")
-        for chunk in new {
-            print("\(chunk.gridX), \(chunk.gridY)")
-        }
         let tempList = new
         for oldChunk in old {
             var match = false

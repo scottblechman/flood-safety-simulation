@@ -102,10 +102,10 @@
 		D2E29E36204660440009946E /* Flood Safety Simulator */ = {
 			isa = PBXGroup;
 			children = (
+				D2E29E39204660440009946E /* art.scnassets */,
 				D29EEBF4206063F700C72DD2 /* location */,
 				D29EEBEF206040CD00C72DD2 /* model */,
 				D2E29E37204660440009946E /* AppDelegate.swift */,
-				D2E29E39204660440009946E /* art.scnassets */,
 				D2E29E3B204660440009946E /* ViewController.swift */,
 				D2E29E3D204660440009946E /* Main.storyboard */,
 				D2E29E40204660440009946E /* Assets.xcassets */,
