@@ -19,6 +19,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     // Current location of the device
     var location: CLLocation? = nil
     
+    // Current heading of the device
+    var heading: CLLocationDirection? = nil
+    
     // Scene attached to the main AR Scene View
     let scene = SCNScene(named: "art.scnassets/world.scn")!
     
@@ -108,15 +111,22 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         synchronize(old: self.chunkList, new: newChunkList)
     }
     
+    func headingUpdated(heading: CLLocationDirection, accuracy: CLLocationDirection) {
+        self.heading = heading
+        
+        print("Updated heading to \((heading.magnitude + 90).truncatingRemainder(dividingBy: 360))")
+    }
+    
     // MARK: - ARSCNViewManager
     
     func addModelFile(world: SCNScene, chunk: Chunk, position: SCNVector3) {
         let geometry = SCNScene(named: "art.scnassets/collada_chunks/chunk_\(chunk.gridX)_\(chunk.gridY).dae")
         let node: SCNNode = (geometry?.rootNode.childNodes[0])!
         node.name = "chunk_\(chunk.gridX)_\(chunk.gridY)"
-        print("Position of \(node.name) fixed to\(position.x), \(position.y), \(position.z)")
+        print("Position of \(node.name ?? "chunk") fixed to \(position.x), \(position.y), \(position.z)")
         //node.position = position
         
+        // normalize the rotation of the geometry loaded from the .dae file
         let xAngle = SCNMatrix4MakeRotation(Float.pi/2, 1, 0, 0)
         let yAngle = SCNMatrix4MakeRotation(0, 0, 1, 0)
         let zAngle = SCNMatrix4MakeRotation(0, 0, 0, 1)
@@ -130,10 +140,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     }
     
     func removeModelFile(world: SCNScene, chunkId: String) {
-        //let geoScene = SCNScene(named: "art.scnassets/ball.dae")
-        //scene.rootNode.addChildNode(geoScene!.rootNode.childNode(withName: "Ball", recursively: true)!)
         let node = scene.rootNode.childNode(withName: chunkId, recursively: true)
-        
         node?.removeFromParentNode()
     }
     
@@ -143,13 +150,21 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         let translationPointX = (chunk.geoAnchor.0, self.location!.coordinate.longitude)
         let translationPointZ = (self.location!.coordinate.latitude, chunk.geoAnchor.1)
         
+        print("Translation points are x: \(translationPointX), z: \(translationPointZ)")
+        
         let translationX = vectorTo(tail: self.location!.coordinate, head: translationPointX)
         let translationZ = vectorTo(tail: self.location!.coordinate, head: translationPointZ)
+        
+        print("Translation vectors are x: \(translationX) z: \(translationZ)")
         
         // Determine the elevation for each chunk by determining its anchor elevation
         // to the current elevation
         let elevationZero = -self.location!.altitude
         let translationY = elevationZero + chunk.anchorElevation
+        
+        // compensate for the rotation caused by starting with the phone not at a cardinal
+        //print("Heading is \(self.location!.)")
+        //let rotationZ =
 
         // SceneKit/AR coordinates are in meters
         let position = SCNVector3(translationX, translationY, translationZ)
@@ -165,7 +180,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     // (the lat/lon location of the device), to a terminal point (the intended chunk origin)
     func vectorTo(tail: CLLocationCoordinate2D, head: (Double, Double)) -> Double {
         // Radius of the Earth, in KM
-        let Radius = 6378.137
+        /*let Radius = 6378.137
         
         let dLat = head.0 * Double.pi / 180 - tail.latitude * Double.pi / 180
         let dLon = head.1 * Double.pi / 180 - tail.longitude * Double.pi / 180
@@ -180,7 +195,9 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
             c *= -1
         }
         
-        return Radius * c * 1000
+        return Radius * c * 1000*/
+        let dist = sqrt(pow(head.0-tail.longitude, 2)+pow(head.1-tail.latitude, 2))
+        return abs(dist)
     }
     
     // Compares the current standing list of active chunks to a pending updated list. Adds,
