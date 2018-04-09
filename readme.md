@@ -27,16 +27,16 @@ A free, open source 3D modeling and animation program. Available [here](https://
 
 ### Creating the Elevation Model
 I began by downloading the 3DEP elevation data for Lubbock from the [National Elevation Dataset](https://viewer.nationalmap.gov/basic/?basemap=b1&category=ned,nedsrc&title=3DEP%20View). I was able to view the data by opening it in [QGIS](https://www.qgis.org/en/site/). By overlaying the elevation data with open source street maps provided by QGIS, I was able to locate our area of play between Glenna Goodacre, 19th Street, University Avenue, and Flint Avenue. I took a screenshot of this area on the heightmap data which produced the following image.
-![Image of heightmap](./elevation.PNG)
+![Image of heightmap](./Images/elevation.PNG)
 
 I then obtained a map of the campus that contains the locations of buildings and took a screenshot of the same area as my heightmap. 
-![Building map image](./ttubuildings.png)
+![Building map image](./Images/ttubuildings.png)
 
 I used [GIMP](https://www.gimp.org/) to isolate the blue buildings and made everything else transparent. I changed the blue to a color of grey appropriate to the hight of an average building on campus for our heightmap and overlayed the building image on the original heightmap, creating this hybrid height map.
-![Image of hybrid height map](./terrainbuildingmerge.png)
+![Image of hybrid height map](./Images/terrainbuildingmerge.png)
 
 I imported this height map to Blender as a texture and applied it as a distortion to a subdivided plane. I broke this plane into the 49 individual chunks that could be laoded by into our AR environment.
-![Image of generated height mesh](./meshPreview.png)
+![Image of generated height mesh](./Images/meshPreview.png)
 
 I exported these chunks individually as collada and ply models. Each chunk was named in the format chunk_x_y where chunk_0_0 correlates to the uppermost left corner.
 
