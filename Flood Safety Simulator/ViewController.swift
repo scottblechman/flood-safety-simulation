@@ -9,8 +9,9 @@ import ARKit
 
 import CoreLocation
 
-class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtocol {
-
+class ViewController: UIViewController, ARSCNViewDelegate,
+LocationUpdateProtocol, GameTickProtocol {
+    
     @IBOutlet var sceneView: ARSCNView!
     
     // Holds reference IDs for the terrain chunks that should be in memory
@@ -28,11 +29,16 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     // Scene attached to the main AR Scene View
     let scene = SCNScene(named: "art.scnassets/world.scn")!
     
+    //var label: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Connect location update messages to ViewController
         LocationProvider.Provider.delegate = self
+        
+        // Connect game update messaging to ViewController
+        GameManager.Manager.delegate = self
         
         // Set the view's delegate
         sceneView.delegate = self
@@ -43,6 +49,34 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         // Set the scene to the view
         sceneView.scene = scene
         
+        // Initialize game start UI
+        let button = UIButton(frame: CGRect(x: 0, y: 0, width: 150, height: 100))
+        button.setTitle("START", for: .normal)
+        button.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)
+        button.tag = 101
+        
+        self.view.addSubview(button)
+        button.center = self.view.center
+    }
+    
+    @objc func buttonAction(sender: UIButton!) {
+        print("Button tapped")
+        GameManager.Manager.startGame()
+        for view in self.view.subviews {
+            if view.tag == sender.tag {
+                view.removeFromSuperview()
+            }
+        }
+        initializeGameInterface()
+    }
+    
+    func initializeGameInterface() {
+        //label.center = CGPoint(x: 160, y: 285)
+        //label.textAlignment = .center
+        //label.tag = 102
+        
+        //self.view.addSubview(label)
+        //label.center = self.view.center
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -112,7 +146,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         let newChunkList = ChunkManager.Manager.update(latitude, longitude)
         
         if heading != nil {
-            synchronize(old: self.chunkList, new: newChunkList)
+            //synchronize(old: self.chunkList, new: newChunkList)
         }
     }
     
@@ -121,6 +155,13 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     func headingUpdated(heading: CLLocationDirection, accuracy: CLLocationDirection) {
         self.heading = heading
         self.trueHeading = (heading.magnitude + 90).truncatingRemainder(dividingBy: 360)
+    }
+    
+    // MARK: - GameTickProtocol
+    
+    func update(time: String, score: String, waterLevel: String) {
+        //label.text = time
+        print(time)
     }
     
     // MARK: - ARSCNViewManager
@@ -144,7 +185,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         node.pivot = SCNMatrix4Mult(rotationMatrix, node.transform)
         
         // TODO: change scale of node to fit documentation
-        node.scale = SCNVector3(x: 4180.0, y: 1.0, z: 3983.42)
+        //node.scale = SCNVector3(x: 4180.0, y: 1.0, z: 3983.42)
         
         world.rootNode.addChildNode(node)
     }
