@@ -5,11 +5,14 @@
 ## CS 4331 - Project 2
 
 ### Purpose
-Using Apple's ARKit, we aim to create an app that will place players in the middle of a flash flood. Their objective, will be to reach a spot safe from the flood waters while avoiding the dangers of a flash flood such as deep and rapidly moving water. Players will be scored based on their ability to reach safety while avoiding these hazards.
+Using Apple's ARKit, we aim to create an app that will place players in the middle of a flash flood. The game's objective will be to reach a spot safe from the flood waters while avoiding the dangers of a flash flood such as deep and rapidly moving water. Players will be scored based on their ability to reach safety while avoiding these hazards.
 
 ### Tools Used
-#### Apple ARKit
-ARKit modeling is used both to visualize rising flood waters and to create elevation environment data used to coordinate water models. Other iOS utilities are used, including CoreLocation to coordinate elevation model creation.
+#### Xcode
+The simulation is written natively in Swift 4. The system architecture is covered in the [Application Architecture](https://github.com/scottblechman/flood-safety-simulation#application-architecture) section. Available through the [Apple Developer Program](https://developer.apple.com/xcode/).
+
+#### ARKit
+Native iOS augmented reality library. Used to render simulated water over real-world terrain, and to include terrain models in the simulated world for more realistic water actions. More information can be found [here](https://developer.apple.com/arkit/).
 
 #### National Elevation Dataset
 All elevation data used in the creation of this app was taken from the National Elevation Dataset (NED), available [here](https://viewer.nationalmap.gov/basic/?basemap=b1&category=ned,nedsrc&title=3DEP%20View).
@@ -25,6 +28,9 @@ A free, open source image editing suite. Available [here](https://www.gimp.org/)
 #### Blender
 A free, open source 3D modeling and animation program. Available [here](https://www.blender.org/).
 
+#### Python
+A high-level programming language. Used to process elevation data retrieved from NED. Available [here](https://www.python.org/).
+
 ### Creating the Elevation Model
 I began by downloading the 3DEP elevation data for Lubbock from the [National Elevation Dataset](https://viewer.nationalmap.gov/basic/?basemap=b1&category=ned,nedsrc&title=3DEP%20View). I was able to view the data by opening it in [QGIS](https://www.qgis.org/en/site/). By overlaying the elevation data with open source street maps provided by QGIS, I was able to locate our area of play between Glenna Goodacre, 19th Street, University Avenue, and Flint Avenue. I took a screenshot of this area on the heightmap data which produced the following image.
 ![Image of heightmap](./Images/elevation.PNG)
@@ -39,9 +45,6 @@ I imported this height map to Blender as a texture and applied it as a distortio
 ![Image of generated height mesh](./Images/meshPreview.png)
 
 I exported these chunks individually as collada and ply models. Each chunk was named in the format chunk_x_y where chunk_0_0 correlates to the uppermost left corner.
-
-### Creating the AR Environment
-The elevation model represents an area of approximately 0.7x0.7 miles (3696x3696 ft). To create an even amount of sections, this area is divided into 49 chunks of 528 sq. ft. When the environment is created, the device location is used to calculate the corresponding chunk along with any bordering chunks. Location is checked periodically (about twice a minute, the average time to run across a chunk), to coordinate loading and unloading of models.
 
 ### Gameplay Design
 #### Objective
@@ -92,6 +95,29 @@ While(!gameEnd){
 
 score.display()
 ```
+
+### Application Architecture
+
+#### Creating the AR Environment
+The elevation model represents an area of approximately 0.7x0.7 miles (3696x3696 ft). To create an even amount of sections, this area is divided into 49 chunks of approximately 528 sq. ft. The application contains .dae model files for each of the 49 chunks; those overlapping and adjacent to the user at a particular point in time are rendered to the AR scene. When the environment is created, the device location is used to calculate the corresponding chunk along with any bordering chunks. Location is checked periodically (after the user has moved approx. 1 meter), to coordinate loading and unloading of models as well as updating the score.
+
+#### View
+The primary view of the application is a single AR SceneView provided by ARKit. This view renders a preview from the rear camera, with a 3D SceneKit environment interacting with the world. Other UI components are overlaid on the SceneView at different points in the game lifecycle.
+
+#### View Controller
+The primary coordination component of the application. Responsible for all logic involving the 3D scene, including maintaining an outlet to the primary view and controlling the scene graph (adding and removing models of chunks into the world, controlling the water model position) relative to the perspective of the user. Sends and receives messages from the model subsystems to coordinate application state among the different components.
+
+#### Location Subsystem
+Uses the Swift CoreLocation library to maintain real-time tracking of the user's geographic location and heading (compass orientation accessed through the device magnometer). Controls initialization and authorization of the device location system for the application, and sends regular location and heading updates to the view controller for synchronization (described below).
+
+#### Terrain Chunk Subsystem
+A "chunk" in the application represents a real-world area of elevation of approximately 528 sq. ft. A chunk is defined by its position in the overall terrain grid (0 ≤ x ≤ 6, 0 ≤ y ≤ 6), and contains information on the geographic coordinates and elevation of its "anchor point" (the top left corner of the chunk, used to align the chunk model in 3D space). The chunks themselves are simply references correlated to specific 3D models; the handling of the models themselved is performed by the view controller using the currently available chunk references.
+
+A chunk manager coordinates with the view controller to provide information on which chunks should and should not be shown in the world. When requested, the chunk manager can use the device's current location to provide the view controller with references to the selected chunks (4 ≤ x ≤ 9) that should be shown in the AR scene.
+
+#### Synchronizing the AR World
+The view controller maintains a collection of the chunks it is currently rendering in the AR scene, using the chunk references provided by the chunk manager. When the device's location 
+
 ### Division of Labor
 #### Fox
 - Create Elevation Model
