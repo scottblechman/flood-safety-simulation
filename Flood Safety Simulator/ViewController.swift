@@ -22,11 +22,11 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     // Current heading of the device
     var heading: CLLocationDirection? = nil
     
+    // Corrected for initial rotation by 90º
+    var trueHeading: Double = 0
+    
     // Scene attached to the main AR Scene View
     let scene = SCNScene(named: "art.scnassets/world.scn")!
-    
-    // temp flag while rendering rect geometries
-    var testRenderFlag: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -98,6 +98,8 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     
     // MARK: - LocationUpdateProtocol
     
+    // Called automatically when a new location is provided. Allows to check the user's
+    // location in order to refresh the world chunks close to the user.
     func locationUpdated(location: CLLocation) {
         self.location = location
         
@@ -108,25 +110,33 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         print("Updated location to \(latitude), \(longitude)")
         
         let newChunkList = ChunkManager.Manager.update(latitude, longitude)
-        synchronize(old: self.chunkList, new: newChunkList)
+        
+        if heading != nil {
+            synchronize(old: self.chunkList, new: newChunkList)
+        }
     }
     
+    // Called automatically when a new location is provided. Allows to update the device's
+    // heading (and true north-facing heading) to properly position chunks in the 3D space.
     func headingUpdated(heading: CLLocationDirection, accuracy: CLLocationDirection) {
         self.heading = heading
-        
-        print("Updated heading to \((heading.magnitude + 90).truncatingRemainder(dividingBy: 360))")
+        self.trueHeading = (heading.magnitude + 90).truncatingRemainder(dividingBy: 360)
     }
     
     // MARK: - ARSCNViewManager
     
+    // Configures a chunk of terrain geometry from a model file to be properly positioned
+    // in the 3D scene.
     func addModelFile(world: SCNScene, chunk: Chunk, position: SCNVector3) {
         let geometry = SCNScene(named: "art.scnassets/collada_chunks/chunk_\(chunk.gridX)_\(chunk.gridY).dae")
         let node: SCNNode = (geometry?.rootNode.childNodes[0])!
         node.name = "chunk_\(chunk.gridX)_\(chunk.gridY)"
         print("Position of \(node.name ?? "chunk") fixed to \(position.x), \(position.y), \(position.z)")
-        //node.position = position
+        node.position = position
         
         // normalize the rotation of the geometry loaded from the .dae file
+        let alignedHeading = Float((self.trueHeading * -1) * Double.pi / 180.0)
+        
         let xAngle = SCNMatrix4MakeRotation(Float.pi/2, 1, 0, 0)
         let yAngle = SCNMatrix4MakeRotation(0, 0, 1, 0)
         let zAngle = SCNMatrix4MakeRotation(0, 0, 0, 1)
@@ -134,11 +144,13 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         node.pivot = SCNMatrix4Mult(rotationMatrix, node.transform)
         
         // TODO: change scale of node to fit documentation
-        //node.scale = SCNVector3(x: 4180.0, y: 1000.0, z: 3983.42)
+        node.scale = SCNVector3(x: 4180.0, y: 1.0, z: 3983.42)
         
         world.rootNode.addChildNode(node)
     }
     
+    // Removes chunks no longer close enough to the user to require rendering from the
+    // scene to improve memory impact.
     func removeModelFile(world: SCNScene, chunkId: String) {
         let node = scene.rootNode.childNode(withName: chunkId, recursively: true)
         node?.removeFromParentNode()
@@ -161,10 +173,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         // to the current elevation
         let elevationZero = -self.location!.altitude
         let translationY = elevationZero + chunk.anchorElevation
-        
-        // compensate for the rotation caused by starting with the phone not at a cardinal
-        //print("Heading is \(self.location!.)")
-        //let rotationZ =
 
         // SceneKit/AR coordinates are in meters
         let position = SCNVector3(translationX, translationY, translationZ)
