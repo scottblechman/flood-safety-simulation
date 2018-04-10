@@ -48,7 +48,7 @@ The elevation model represents an area of approximately 0.7x0.7 miles (3696x3696
 The objective of the player is to reach a safe location by the end of the simulation and place themselves in the least danger while doing so. Players will receive a numerical final score to reflect how well they achieved these goals. A score of greater than 100 indicates that they took minimal risks while reaching safety.
 
 #### Scoring
-Players begin with 120 points. On each game tick (approximately every 5 seconds?), we determine the water level at their location. Players will have points deducted based on the number of inches of water they are standing in. Deductions are shown in the table below:
+Players begin with 120 points. On each game tick, we determine the water level at their location. Players will have points deducted based on the number of inches of water they are standing in. Deductions are shown in the table below:
 
 | Water Level | Points Deducted |
 | ----------- | --------------- |
@@ -87,7 +87,7 @@ While(!gameEnd){
   if (gameTimer >= timeLimit)
     gameEnd = true
 
-  gameTimer += tickTime //tickTime is approx. 5 seconds
+  gameTimer += tickTime
 }
 
 score.display()
