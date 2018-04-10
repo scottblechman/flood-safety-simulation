@@ -21,6 +21,12 @@ class Chunk: SCNNode{
     // Chunk IDs follow the format "chunk_x_y"
     var chunkId: String
     
+    // Intended origin point of the chunk in space
+    var geoAnchor: (Double, Double)
+    
+    // Intended altitude of the chunk above sea level
+    var anchorElevation: Double
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -30,9 +36,15 @@ class Chunk: SCNNode{
         self.gridX = x
         self.gridY = y
         self.anchor = anchor
+        
         self.chunkId = "\(x)_\(y)"
         
-        // Class data associated with SCNNode must be declared following super method
+        // Determine where the chunk should be located relative to the corner of the entire map.
+        let anchorX = FACE_WEST+(INCREMENT_X*Double(x))
+        let anchorY = FACE_NORTH-(INCREMENT_Z*Double(y))
+        self.geoAnchor = (anchorX, anchorY)
+        self.anchorElevation = Y_POINTS[x][y]
+        
         super.init()
     }
 }
