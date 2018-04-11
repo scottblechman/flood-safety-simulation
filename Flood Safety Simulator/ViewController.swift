@@ -72,26 +72,27 @@ LocationUpdateProtocol, GameTickProtocol {
     }
     
     func initializeGameInterface() {
-        labelTimer.center = CGPoint(x: 160, y: 285)
+        labelTimer.center = CGPoint(x: 96, y: 96)
         labelTimer.textAlignment = .center
         labelTimer.tag = 102
         labelTimer.translatesAutoresizingMaskIntoConstraints = false
         
         self.view.addSubview(labelTimer)
         
-        labelTimer.heightAnchor.constraint(equalToConstant: 200).isActive = true
-        labelTimer.widthAnchor.constraint(equalToConstant: 200).isActive = true
+        labelTimer.heightAnchor.constraint(equalToConstant: 96).isActive = true
+        labelTimer.widthAnchor.constraint(equalToConstant: 96).isActive = true
         labelTimer.leadingAnchor.constraint(equalTo: labelTimer.superview!.leadingAnchor).isActive = true
         labelTimer.topAnchor.constraint(equalTo: labelTimer.superview!.topAnchor).isActive = true
         
-        labelScore.center = CGPoint(x: 160, y: 285)
+        labelScore.center = CGPoint(x: view.bounds.size.width-112, y: 96)
         labelScore.textAlignment = .center
         labelScore.tag = 103
+        labelScore.translatesAutoresizingMaskIntoConstraints = false
         
         self.view.addSubview(labelScore)
         
-        labelScore.heightAnchor.constraint(equalToConstant: 200).isActive = true
-        labelScore.widthAnchor.constraint(equalToConstant: 200).isActive = true
+        labelScore.heightAnchor.constraint(equalToConstant: 96).isActive = true
+        labelScore.widthAnchor.constraint(equalToConstant: 96).isActive = true
         labelScore.trailingAnchor.constraint(equalTo: labelScore.superview!.trailingAnchor).isActive = true
         labelScore.topAnchor.constraint(equalTo: labelScore.superview!.topAnchor).isActive = true
     }
