@@ -29,7 +29,8 @@ LocationUpdateProtocol, GameTickProtocol {
     // Scene attached to the main AR Scene View
     let scene = SCNScene(named: "art.scnassets/world.scn")!
     
-    //var label: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
+    var labelTimer: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
+    var labelScore: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,12 +72,28 @@ LocationUpdateProtocol, GameTickProtocol {
     }
     
     func initializeGameInterface() {
-        //label.center = CGPoint(x: 160, y: 285)
-        //label.textAlignment = .center
-        //label.tag = 102
+        labelTimer.center = CGPoint(x: 160, y: 285)
+        labelTimer.textAlignment = .center
+        labelTimer.tag = 102
+        labelTimer.translatesAutoresizingMaskIntoConstraints = false
         
-        //self.view.addSubview(label)
-        //label.center = self.view.center
+        self.view.addSubview(labelTimer)
+        
+        labelTimer.heightAnchor.constraint(equalToConstant: 200).isActive = true
+        labelTimer.widthAnchor.constraint(equalToConstant: 200).isActive = true
+        labelTimer.leadingAnchor.constraint(equalTo: labelTimer.superview!.leadingAnchor).isActive = true
+        labelTimer.topAnchor.constraint(equalTo: labelTimer.superview!.topAnchor).isActive = true
+        
+        labelScore.center = CGPoint(x: 160, y: 285)
+        labelScore.textAlignment = .center
+        labelScore.tag = 103
+        
+        self.view.addSubview(labelScore)
+        
+        labelScore.heightAnchor.constraint(equalToConstant: 200).isActive = true
+        labelScore.widthAnchor.constraint(equalToConstant: 200).isActive = true
+        labelScore.trailingAnchor.constraint(equalTo: labelScore.superview!.trailingAnchor).isActive = true
+        labelScore.topAnchor.constraint(equalTo: labelScore.superview!.topAnchor).isActive = true
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -159,9 +176,11 @@ LocationUpdateProtocol, GameTickProtocol {
     
     // MARK: - GameTickProtocol
     
-    func update(time: String, score: String, waterLevel: String) {
-        //label.text = time
+    func update(time: String, score: String, waterLevel: Double) {
+        labelTimer.text = time
+        labelScore.text = score
         print(time)
+        GameManager.Manager.updateScore(location: self.location!)
     }
     
     // MARK: - ARSCNViewManager
