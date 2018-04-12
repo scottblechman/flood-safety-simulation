@@ -57,7 +57,17 @@ LocationUpdateProtocol, GameTickProtocol {
         sceneView.scene = scene
         
         // Initialize game start UI
-        let button = UIButton(frame: CGRect(x: 0, y: 0, width: 150, height: 100))
+        let button = UIButton(type: .custom)
+        button.frame = CGRect(x: 0, y: 0, width: 150, height: 50)
+        let _border = CAShapeLayer()
+        _border.path = UIBezierPath(roundedRect: button.bounds, cornerRadius:button.frame.size.width/2).cgPath
+        _border.frame = button.bounds
+        _border.strokeColor = UIColor.white.cgColor
+        _border.fillColor = UIColor.white.cgColor
+        _border.lineWidth = 3.0
+        button.layer.addSublayer(_border)
+        button.setTitleColor(UIColor.black, for: .normal)
+        
         button.setTitle("START", for: .normal)
         button.addTarget(self, action: #selector(runGame), for: .touchUpInside)
         button.tag = 101
