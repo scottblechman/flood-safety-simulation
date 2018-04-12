@@ -32,6 +32,8 @@ LocationUpdateProtocol, GameTickProtocol {
     var labelTimer: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
     var labelScore: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
     
+    var gameEndLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -71,6 +73,20 @@ LocationUpdateProtocol, GameTickProtocol {
         initializeGameInterface()
     }
     
+    @objc func resetButtonAction(sender: UIButton!) {
+        print("Reset button tapped")
+        GameManager.Manager.startGame()
+        for view in self.view.subviews {
+            if view.tag == sender.tag {
+                view.removeFromSuperview()
+            }
+            else if view.tag == gameEndLabel.tag {
+                view.removeFromSuperview()
+            }
+        }
+        initializeGameInterface()
+    }
+    
     func initializeGameInterface() {
         labelTimer.center = CGPoint(x: 96, y: 96)
         labelTimer.textAlignment = .center
@@ -95,6 +111,11 @@ LocationUpdateProtocol, GameTickProtocol {
         labelScore.widthAnchor.constraint(equalToConstant: 96).isActive = true
         labelScore.trailingAnchor.constraint(equalTo: labelScore.superview!.trailingAnchor).isActive = true
         labelScore.topAnchor.constraint(equalTo: labelScore.superview!.topAnchor).isActive = true
+    }
+    
+    func removeGameInterface() {
+        labelTimer.removeFromSuperview()
+        labelScore.removeFromSuperview()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -177,11 +198,35 @@ LocationUpdateProtocol, GameTickProtocol {
     
     // MARK: - GameTickProtocol
     
-    func update(time: String, score: String, waterLevel: Double) {
+    // Called automatically when the game timer performs an update. Reflects the game state in
+    // the UI.
+    func update(time: String, score: String, waterLevel: Double, elevation: Double) {
         labelTimer.text = time
         labelScore.text = score
         print(time)
         GameManager.Manager.updateScore(location: self.location!)
+    }
+    
+    func gameEnded(score: String) {
+        removeGameInterface()
+        
+        gameEndLabel.text = "Game Over Score: "+score
+        gameEndLabel.tag = 201
+        self.view.addSubview(gameEndLabel)
+        gameEndLabel.center = self.view.center
+        
+        let resetButton = UIButton(frame: CGRect(x: 0, y: 0, width: 150, height: 100))
+        resetButton.setTitle("TRY AGAIN", for: .normal)
+        resetButton.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)
+        resetButton.tag = 202
+        
+        self.view.addSubview(resetButton)
+        resetButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        resetButton.heightAnchor.constraint(equalToConstant: 96).isActive = true
+        resetButton.widthAnchor.constraint(equalToConstant: 96).isActive = true
+        resetButton.centerXAnchor.constraint(equalTo: resetButton.superview!.centerXAnchor).isActive = true
+        resetButton.bottomAnchor.constraint(equalTo: resetButton.superview!.bottomAnchor).isActive = true
     }
     
     // MARK: - ARSCNViewManager
