@@ -10,7 +10,8 @@ import Foundation
 import CoreLocation
 
 protocol GameTickProtocol {
-    func update(time: String, score: String, waterLevel: Double)
+    func update(time: String, score: String, waterLevel: Double, elevation: Double)
+    func gameEnded(score: String)
 }
 
 class GameManager {
@@ -41,6 +42,8 @@ class GameManager {
     var score: Int = 120
     
     func startGame() {
+        score = 120
+        seconds = 180
         // water level will always be at least .2 m, at the most .4 m
         finalWaterLevel = Double(20 + arc4random_uniform(21))
         elevation = minElevationLevel
@@ -64,9 +67,10 @@ class GameManager {
         seconds -= 1
         elevation += tickAmount
         waterLevel += tickAmount
-        delegate?.update(time: displayTimeRemaining(), score: "Score: \(score)", waterLevel: waterLevel)
+        delegate?.update(time: displayTimeRemaining(), score: "Score: \(score)", waterLevel: waterLevel, elevation: elevation)
         if seconds <= 0 {
             timer.invalidate()
+            delegate?.gameEnded(score: "\(score)")
         }
     }
     
@@ -86,6 +90,11 @@ class GameManager {
             default:
                 score -= 0
             }
+        }
+        
+        if score < 0 {
+            timer.invalidate()
+            delegate?.gameEnded(score: "0")
         }
     }
 }
