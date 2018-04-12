@@ -9,8 +9,9 @@ import ARKit
 
 import CoreLocation
 
-class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtocol {
-
+class ViewController: UIViewController, ARSCNViewDelegate,
+LocationUpdateProtocol, GameTickProtocol {
+    
     @IBOutlet var sceneView: ARSCNView!
     
     // Holds reference IDs for the terrain chunks that should be in memory
@@ -28,11 +29,19 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     // Scene attached to the main AR Scene View
     let scene = SCNScene(named: "art.scnassets/world.scn")!
     
+    var labelTimer: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
+    var labelScore: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
+    
+    var gameEndLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Connect location update messages to ViewController
         LocationProvider.Provider.delegate = self
+        
+        // Connect game update messaging to ViewController
+        GameManager.Manager.delegate = self
         
         // Set the view's delegate
         sceneView.delegate = self
@@ -43,6 +52,70 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         // Set the scene to the view
         sceneView.scene = scene
         
+        // Initialize game start UI
+        let button = UIButton(frame: CGRect(x: 0, y: 0, width: 150, height: 100))
+        button.setTitle("START", for: .normal)
+        button.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)
+        button.tag = 101
+        
+        self.view.addSubview(button)
+        button.center = self.view.center
+    }
+    
+    @objc func buttonAction(sender: UIButton!) {
+        print("Button tapped")
+        GameManager.Manager.startGame()
+        for view in self.view.subviews {
+            if view.tag == sender.tag {
+                view.removeFromSuperview()
+            }
+        }
+        initializeGameInterface()
+    }
+    
+    @objc func resetButtonAction(sender: UIButton!) {
+        print("Reset button tapped")
+        GameManager.Manager.startGame()
+        for view in self.view.subviews {
+            if view.tag == sender.tag {
+                view.removeFromSuperview()
+            }
+            else if view.tag == gameEndLabel.tag {
+                view.removeFromSuperview()
+            }
+        }
+        initializeGameInterface()
+    }
+    
+    func initializeGameInterface() {
+        labelTimer.center = CGPoint(x: 96, y: 96)
+        labelTimer.textAlignment = .center
+        labelTimer.tag = 102
+        labelTimer.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.view.addSubview(labelTimer)
+        
+        labelTimer.heightAnchor.constraint(equalToConstant: 96).isActive = true
+        labelTimer.widthAnchor.constraint(equalToConstant: 96).isActive = true
+        labelTimer.leadingAnchor.constraint(equalTo: labelTimer.superview!.leadingAnchor).isActive = true
+        labelTimer.topAnchor.constraint(equalTo: labelTimer.superview!.topAnchor).isActive = true
+        
+        labelScore.center = CGPoint(x: view.bounds.size.width-112, y: 96)
+        labelScore.textAlignment = .center
+        labelScore.tag = 103
+        labelScore.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.view.addSubview(labelScore)
+        
+        labelScore.heightAnchor.constraint(equalToConstant: 96).isActive = true
+        labelScore.widthAnchor.constraint(equalToConstant: 96).isActive = true
+        labelScore.trailingAnchor.constraint(equalTo: labelScore.superview!.trailingAnchor).isActive = true
+        labelScore.topAnchor.constraint(equalTo: labelScore.superview!.topAnchor).isActive = true
+    }
+    
+    func removeGameInterface() {
+        labelTimer.removeFromSuperview()
+        labelScore.removeFromSuperview()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -112,7 +185,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         let newChunkList = ChunkManager.Manager.update(latitude, longitude)
         
         if heading != nil {
-            synchronize(old: self.chunkList, new: newChunkList)
+            //synchronize(old: self.chunkList, new: newChunkList)
         }
     }
     
@@ -121,6 +194,39 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
     func headingUpdated(heading: CLLocationDirection, accuracy: CLLocationDirection) {
         self.heading = heading
         self.trueHeading = (heading.magnitude + 90).truncatingRemainder(dividingBy: 360)
+    }
+    
+    // MARK: - GameTickProtocol
+    
+    // Called automatically when the game timer performs an update. Reflects the game state in
+    // the UI.
+    func update(time: String, score: String, waterLevel: Double, elevation: Double) {
+        labelTimer.text = time
+        labelScore.text = score
+        print(time)
+        GameManager.Manager.updateScore(location: self.location!)
+    }
+    
+    func gameEnded(score: String) {
+        removeGameInterface()
+        
+        gameEndLabel.text = "Game Over Score: "+score
+        gameEndLabel.tag = 201
+        self.view.addSubview(gameEndLabel)
+        gameEndLabel.center = self.view.center
+        
+        let resetButton = UIButton(frame: CGRect(x: 0, y: 0, width: 150, height: 100))
+        resetButton.setTitle("TRY AGAIN", for: .normal)
+        resetButton.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)
+        resetButton.tag = 202
+        
+        self.view.addSubview(resetButton)
+        resetButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        resetButton.heightAnchor.constraint(equalToConstant: 96).isActive = true
+        resetButton.widthAnchor.constraint(equalToConstant: 96).isActive = true
+        resetButton.centerXAnchor.constraint(equalTo: resetButton.superview!.centerXAnchor).isActive = true
+        resetButton.bottomAnchor.constraint(equalTo: resetButton.superview!.bottomAnchor).isActive = true
     }
     
     // MARK: - ARSCNViewManager
@@ -144,7 +250,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, LocationUpdateProtoco
         node.pivot = SCNMatrix4Mult(rotationMatrix, node.transform)
         
         // TODO: change scale of node to fit documentation
-        node.scale = SCNVector3(x: 4180.0, y: 1.0, z: 3983.42)
+        //node.scale = SCNVector3(x: 4180.0, y: 1.0, z: 3983.42)
         
         world.rootNode.addChildNode(node)
     }
