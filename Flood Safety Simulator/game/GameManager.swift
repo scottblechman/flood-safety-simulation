@@ -10,7 +10,7 @@ import Foundation
 import CoreLocation
 
 protocol GameTickProtocol {
-    func update(time: String, score: String, waterLevel: Double, elevation: Double)
+    func update(time: String, score: String, waterLevel: Double, elevation: Double, tickAmount: Double)
     func gameEnded(score: String)
 }
 
@@ -67,7 +67,7 @@ class GameManager {
         seconds -= 1
         elevation += tickAmount
         waterLevel += tickAmount
-        delegate?.update(time: displayTimeRemaining(), score: "Score: \(score)", waterLevel: waterLevel, elevation: elevation)
+        delegate?.update(time: displayTimeRemaining(), score: "Score: \(score)", waterLevel: waterLevel, elevation: elevation, tickAmount: tickAmount)
         if seconds <= 0 {
             timer.invalidate()
             delegate?.gameEnded(score: "\(score)")

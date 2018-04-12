@@ -20,6 +20,8 @@ LocationUpdateProtocol, GameTickProtocol {
     // Current location of the device
     var location: CLLocation? = nil
     
+    var elevationDelta: Double = 0
+    
     // Current heading of the device
     var heading: CLLocationDirection? = nil
     
@@ -29,9 +31,11 @@ LocationUpdateProtocol, GameTickProtocol {
     // Scene attached to the main AR Scene View
     let scene = SCNScene(named: "art.scnassets/world.scn")!
     
+    var assetsLoaded = false
+    
+    // UI components programatically shown and hidden
     var labelTimer: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
     var labelScore: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
-    
     var gameEndLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
     
     override func viewDidLoad() {
@@ -55,25 +59,57 @@ LocationUpdateProtocol, GameTickProtocol {
         // Initialize game start UI
         let button = UIButton(frame: CGRect(x: 0, y: 0, width: 150, height: 100))
         button.setTitle("START", for: .normal)
-        button.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)
+        button.addTarget(self, action: #selector(runGame), for: .touchUpInside)
         button.tag = 101
         
         self.view.addSubview(button)
         button.center = self.view.center
     }
     
-    @objc func buttonAction(sender: UIButton!) {
-        print("Button tapped")
-        GameManager.Manager.startGame()
-        for view in self.view.subviews {
-            if view.tag == sender.tag {
-                view.removeFromSuperview()
-            }
-        }
-        initializeGameInterface()
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // Create a session configuration
+        let configuration = ARWorldTrackingConfiguration()
+        
+        // Enable plane detection
+        configuration.planeDetection = .horizontal
+
+        // Run the view's session
+        sceneView.session.run(configuration)
     }
     
-    @objc func resetButtonAction(sender: UIButton!) {
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        // Pause the view's session
+        sceneView.session.pause()
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Release any cached data, images, etc that aren't in use.
+        // Might want to scale back model rendering here, if possible.
+    }
+    
+    // MARK: - UserInterface
+    
+    @objc func runGame(sender: UIButton!) {
+        print("Button tapped")
+        let children = scene.rootNode.childNodes.count
+        if children >= 1 {
+            print("Water and terrain available, starting game")
+            GameManager.Manager.startGame()
+            for view in self.view.subviews {
+                if view.tag == sender.tag {
+                    view.removeFromSuperview()
+                }
+            }
+            initializeGameInterface()
+        }
+    }
+    
+    @objc func resetGame(sender: UIButton!) {
         print("Reset button tapped")
         GameManager.Manager.startGame()
         for view in self.view.subviews {
@@ -117,32 +153,6 @@ LocationUpdateProtocol, GameTickProtocol {
         labelTimer.removeFromSuperview()
         labelScore.removeFromSuperview()
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        // Create a session configuration
-        let configuration = ARWorldTrackingConfiguration()
-        
-        // Enable plane detection
-        configuration.planeDetection = .horizontal
-
-        // Run the view's session
-        sceneView.session.run(configuration)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        // Pause the view's session
-        sceneView.session.pause()
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Release any cached data, images, etc that aren't in use.
-        // Might want to scale back model rendering here, if possible.
-    }
 
     // MARK: - ARSCNViewDelegate
 
@@ -174,6 +184,11 @@ LocationUpdateProtocol, GameTickProtocol {
     // Called automatically when a new location is provided. Allows to check the user's
     // location in order to refresh the world chunks close to the user.
     func locationUpdated(location: CLLocation) {
+        if self.location != nil {
+            self.elevationDelta = self.location!.altitude - location.altitude
+        } else {
+            self.elevationDelta = 0
+        }
         self.location = location
         
         // Do any chunk updating required at the new location
@@ -186,6 +201,14 @@ LocationUpdateProtocol, GameTickProtocol {
         
         if heading != nil {
             //synchronize(old: self.chunkList, new: newChunkList)
+        }
+        
+        if assetsLoaded == false && heading != nil {
+            let bottomElevation = GameManager.Manager.minElevationLevel - location.altitude
+            print("Bottom elevation translation is \(bottomElevation)")
+            addWaterGeometry(world: sceneView.scene, initialPosition: bottomElevation)
+            addTerrainGeometry(world: sceneView.scene, initialPosition: bottomElevation)
+            assetsLoaded = true
         }
     }
     
@@ -200,13 +223,15 @@ LocationUpdateProtocol, GameTickProtocol {
     
     // Called automatically when the game timer performs an update. Reflects the game state in
     // the UI.
-    func update(time: String, score: String, waterLevel: Double, elevation: Double) {
+    func update(time: String, score: String, waterLevel: Double, elevation: Double, tickAmount: Double) {
         labelTimer.text = time
         labelScore.text = score
         print(time)
+        tickWater(increment: Float(tickAmount), elevationDelta: Float(elevationDelta))
         GameManager.Manager.updateScore(location: self.location!)
     }
     
+    // Called automatically when the game manager has determined the game should end.
     func gameEnded(score: String) {
         removeGameInterface()
         
@@ -217,7 +242,7 @@ LocationUpdateProtocol, GameTickProtocol {
         
         let resetButton = UIButton(frame: CGRect(x: 0, y: 0, width: 150, height: 100))
         resetButton.setTitle("TRY AGAIN", for: .normal)
-        resetButton.addTarget(self, action: #selector(buttonAction), for: .touchUpInside)
+        resetButton.addTarget(self, action: #selector(resetGame(sender:)), for: .touchUpInside)
         resetButton.tag = 202
         
         self.view.addSubview(resetButton)
@@ -253,6 +278,40 @@ LocationUpdateProtocol, GameTickProtocol {
         //node.scale = SCNVector3(x: 4180.0, y: 1.0, z: 3983.42)
         
         world.rootNode.addChildNode(node)
+    }
+    
+    func addWaterGeometry(world: SCNScene, initialPosition: Double) {
+        let geometry = SCNScene(named: "art.scnassets/water.dae")
+        let node: SCNNode = (geometry?.rootNode.childNodes[0])!
+        node.name = "water"
+        
+        node.scale = SCNVector3(x: 500.0, y: 1.0, z: 500.0)
+        node.position = SCNVector3Make(0.0, Float(initialPosition)*10, 0.0)
+        
+        world.rootNode.addChildNode(node)
+    }
+    
+    func addTerrainGeometry(world: SCNScene, initialPosition: Double) {
+        /*let geometry = SCNScene(named: "art.scnassets/campus.dae")
+        let node: SCNNode = (geometry?.rootNode.childNodes[0])!
+        node.name = "terrain"
+        
+        //let xAngle = SCNMatrix4MakeRotation(Float.pi/2, 1, 0, 0)
+        //let yAngle = SCNMatrix4MakeRotation(0, 0, 1, 0)
+        //let zAngle = SCNMatrix4MakeRotation(0, 0, 0, 1)
+        //let rotationMatrix = SCNMatrix4Mult(SCNMatrix4Mult(xAngle, yAngle), zAngle)
+        //node.pivot = SCNMatrix4Mult(rotationMatrix, node.transform)
+        
+        // TODO: change scale of node to fit documentation
+        node.scale = SCNVector3(x: 1000.0, y: 1000.0, z: 1000.0)
+        node.position = SCNVector3Make(0.0, Float(initialPosition), 0.0)
+        
+        world.rootNode.addChildNode(node)*/
+    }
+    
+    func tickWater(increment: Float, elevationDelta: Float) {
+        let node = scene.rootNode.childNode(withName: "water", recursively: true)
+        node?.position.y += (increment) - elevationDelta
     }
     
     // Removes chunks no longer close enough to the user to require rendering from the
