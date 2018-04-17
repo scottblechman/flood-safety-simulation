@@ -42,6 +42,7 @@ LocationUpdateProtocol, GameTickProtocol {
     var gameEndLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 128, height: 128))
     
     var gameLabelBackgroundView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
+    var scoreModal = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -125,6 +126,9 @@ LocationUpdateProtocol, GameTickProtocol {
             else if view.tag == gameEndLabel.tag {
                 view.removeFromSuperview()
             }
+            else if view.tag == scoreModal.tag {
+                view.removeFromSuperview()
+            }
         }
         
         initializeGameInterface()
@@ -157,9 +161,10 @@ LocationUpdateProtocol, GameTickProtocol {
     
     func initializeGameEndInterface(_ score: String) {
         // Game over information
-        let scoreModal = UIView(frame: CGRect(x: 72, y: 72, width: view.frame.width / 1.5, height: view.frame.height / 4 ))
+        scoreModal = UIView(frame: CGRect(x: 72, y: 72, width: view.frame.width / 1.5, height: view.frame.height / 4 ))
         scoreModal.layer.cornerRadius = 8
         scoreModal.backgroundColor = UIColor.white
+        scoreModal.tag = 301
         self.view.addSubview(scoreModal)
         
         gameEndLabel = UILabel(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 128))
