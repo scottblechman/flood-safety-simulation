@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		D2398FBF207D142A00AEED65 /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2398FBE207D142A00AEED65 /* GameManager.swift */; };
+		D2398FC42085C8AF00AEED65 /* rain.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = D2398FC32085C8AF00AEED65 /* rain.mp3 */; };
+		D2398FC92085CA8300AEED65 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D2398FC72085CA8300AEED65 /* Assets.xcassets */; };
+		D2398FCC2085CD4F00AEED65 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = D2398FCA2085CD4F00AEED65 /* spark.png */; };
+		D2398FCD2085CD4F00AEED65 /* RainParticleSystem.scnp in Resources */ = {isa = PBXBuildFile; fileRef = D2398FCB2085CD4F00AEED65 /* RainParticleSystem.scnp */; };
 		D29EEBF1206040EB00C72DD2 /* Chunk.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29EEBF0206040EB00C72DD2 /* Chunk.swift */; };
 		D29EEBF32060582300C72DD2 /* ChunkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29EEBF22060582300C72DD2 /* ChunkManager.swift */; };
 		D29EEBF62060640400C72DD2 /* LocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29EEBF52060640400C72DD2 /* LocationProvider.swift */; };
@@ -32,6 +36,10 @@
 
 /* Begin PBXFileReference section */
 		D2398FBE207D142A00AEED65 /* GameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
+		D2398FC32085C8AF00AEED65 /* rain.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = rain.mp3; sourceTree = "<group>"; };
+		D2398FC72085CA8300AEED65 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = particle/Assets.xcassets; sourceTree = "<group>"; };
+		D2398FCA2085CD4F00AEED65 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
+		D2398FCB2085CD4F00AEED65 /* RainParticleSystem.scnp */ = {isa = PBXFileReference; lastKnownFileType = file.scp; path = RainParticleSystem.scnp; sourceTree = "<group>"; };
 		D29EEBF0206040EB00C72DD2 /* Chunk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Chunk.swift; sourceTree = "<group>"; };
 		D29EEBF22060582300C72DD2 /* ChunkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChunkManager.swift; sourceTree = "<group>"; };
 		D29EEBF52060640400C72DD2 /* LocationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationProvider.swift; sourceTree = "<group>"; };
@@ -74,6 +82,14 @@
 			path = game;
 			sourceTree = "<group>";
 		};
+		D2398FC02085C7B700AEED65 /* audio */ = {
+			isa = PBXGroup;
+			children = (
+				D2398FC32085C8AF00AEED65 /* rain.mp3 */,
+			);
+			path = audio;
+			sourceTree = "<group>";
+		};
 		D29EEBEF206040CD00C72DD2 /* model */ = {
 			isa = PBXGroup;
 			children = (
@@ -112,6 +128,8 @@
 		D2E29E36204660440009946E /* Flood Safety Simulator */ = {
 			isa = PBXGroup;
 			children = (
+				D2398FC72085CA8300AEED65 /* Assets.xcassets */,
+				D2398FC02085C7B700AEED65 /* audio */,
 				D2E29E39204660440009946E /* art.scnassets */,
 				D2398FBD207D13ED00AEED65 /* game */,
 				D29EEBF4206063F700C72DD2 /* location */,
@@ -122,6 +140,8 @@
 				D2E29E40204660440009946E /* Assets.xcassets */,
 				D2E29E42204660440009946E /* LaunchScreen.storyboard */,
 				D2E29E45204660440009946E /* Info.plist */,
+				D2398FCA2085CD4F00AEED65 /* spark.png */,
+				D2398FCB2085CD4F00AEED65 /* RainParticleSystem.scnp */,
 			);
 			path = "Flood Safety Simulator";
 			sourceTree = "<group>";
@@ -219,8 +239,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				D2E29E3A204660440009946E /* art.scnassets in Resources */,
+				D2398FC42085C8AF00AEED65 /* rain.mp3 in Resources */,
 				D2E29E44204660440009946E /* LaunchScreen.storyboard in Resources */,
+				D2398FCD2085CD4F00AEED65 /* RainParticleSystem.scnp in Resources */,
 				D2E29E41204660440009946E /* Assets.xcassets in Resources */,
+				D2398FC92085CA8300AEED65 /* Assets.xcassets in Resources */,
+				D2398FCC2085CD4F00AEED65 /* spark.png in Resources */,
 				D2E29E3F204660440009946E /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

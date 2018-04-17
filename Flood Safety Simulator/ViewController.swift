@@ -7,7 +7,8 @@ import UIKit
 import SceneKit
 import ARKit
 
-import CoreLocation
+import CoreLocation //Location protocol communication
+import AVFoundation // Audio playback
 
 class ViewController: UIViewController, ARSCNViewDelegate,
 LocationUpdateProtocol, GameTickProtocol {
@@ -22,7 +23,6 @@ LocationUpdateProtocol, GameTickProtocol {
     
     var elevationDelta: Double = 0
     
-    
     // Current heading of the device
     var heading: CLLocationDirection? = nil
     
@@ -33,6 +33,8 @@ LocationUpdateProtocol, GameTickProtocol {
     let scene = SCNScene(named: "art.scnassets/world.scn")!
     
     var assetsLoaded = false
+    
+    var player: AVAudioPlayer?
     
     // UI components programatically shown and hidden
     var labelTimer: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
@@ -98,6 +100,8 @@ LocationUpdateProtocol, GameTickProtocol {
         let children = scene.rootNode.childNodes.count
         if children >= 1 {
             print("Water and terrain available, starting game")
+            playAudio()
+            startRainEffect()
             GameManager.Manager.startGame()
             for view in self.view.subviews {
                 if view.tag == sender.tag {
@@ -111,6 +115,8 @@ LocationUpdateProtocol, GameTickProtocol {
     // Called when the reset button is tapped after a game has ended.
     @objc func resetGame(sender: UIButton!) {
         print("Reset button tapped")
+        playAudio()
+        startRainEffect()
         GameManager.Manager.startGame()
         for view in self.view.subviews {
             if view.tag == sender.tag {
@@ -166,23 +172,6 @@ LocationUpdateProtocol, GameTickProtocol {
         scoreModal.addSubview(gameEndLabel)
         gameEndLabel.center = CGPoint(x: view.frame.width / 2 - 72, y: view.frame.height / 2 - 272)
         
-        /*let labelBorder = CAShapeLayer()
-        labelBorder.path = UIBezierPath(roundedRect: gameEndLabel.bounds, cornerRadius:gameEndLabel.frame.size.width/2).cgPath
-        labelBorder.frame = gameEndLabel.bounds
-        labelBorder.strokeColor = UIColor.white.cgColor
-        labelBorder.fillColor = UIColor.white.cgColor
-        labelBorder.lineWidth = 3.0
-        gameEndLabel.layer.addSublayer(labelBorder)
-        gameEndLabel.textColor = UIColor.black
-        
-        self.view.addSubview(gameEndLabel)
-        gameEndLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        gameEndLabel.heightAnchor.constraint(equalToConstant: 96).isActive = true
-        gameEndLabel.widthAnchor.constraint(equalToConstant: 96).isActive = true
-        gameEndLabel.centerXAnchor.constraint(equalTo: gameEndLabel.superview!.centerXAnchor).isActive = true
-        gameEndLabel.topAnchor.constraint(equalTo: gameEndLabel.superview!.topAnchor).isActive = true*/
-        
         // Reset button
         let resetButton = UIButton(type: .custom)
         resetButton.frame = CGRect(x: 0, y: 0, width: 150, height: 50)
@@ -201,12 +190,6 @@ LocationUpdateProtocol, GameTickProtocol {
         
         self.view.addSubview(resetButton)
         resetButton.center = self.view.center
-        /*resetButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        resetButton.heightAnchor.constraint(equalToConstant: 96).isActive = true
-        resetButton.widthAnchor.constraint(equalToConstant: 96).isActive = true
-        resetButton.centerXAnchor.constraint(equalTo: resetButton.superview!.centerXAnchor).isActive = true
-        resetButton.bottomAnchor.constraint(equalTo: resetButton.superview!.bottomAnchor).isActive = true*/
     }
     
     // Programatically creates and styles the labels that need to appear as a game overlay,
@@ -475,5 +458,44 @@ LocationUpdateProtocol, GameTickProtocol {
             addChunkGeometry(scene, chunk)
         }
         chunkList = tempList
+    }
+    
+    //MARK: - AVFoundation
+    
+    // Plays rain sound effects during gameplay
+    func playAudio() {
+        guard let url = Bundle.main.url(forResource: "rain", withExtension: "mp3") else { return }
+        
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+            try AVAudioSession.sharedInstance().setActive(true)
+            
+            // iOS 11
+            player = try AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileType.mp3.rawValue)
+            /* <= iOS 10
+             player = try AVAudioPlayer(contentsOf: url, fileTypeHint: AVFileTypeMPEGLayer3) */
+            
+            guard let player = player else { return }
+            player.volume = 0
+            player.play()
+            player.setVolume(1, fadeDuration: 1.5)
+            
+        } catch let error {
+            print(error.localizedDescription)
+        }
+    }
+    
+    //MARK: - SKParticleEmitter
+    func startRainEffect() {
+        /*var path = Bundle.main.path(forResource: "RainParticle", ofType: "sks")
+        var rainParticle = NSKeyedUnarchiver.unarchiveObject(withFile: path!) as! SKEmitterNode
+        
+        rainParticle.position = CGPoint(x: view.frame.width, y: view.frame.height)
+        rainParticle.name = "rainParticle"
+        rainParticle.targetNode
+        
+        sceneView.scene.addChild(rainParticle)*/
+        let particle = SCNParticleSystem(named: "RainParticleSystem", inDirectory: nil)!
+        sceneView.scene.rootNode.addParticleSystem(particle)
     }
 }
