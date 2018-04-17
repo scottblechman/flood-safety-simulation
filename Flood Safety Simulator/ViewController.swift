@@ -284,7 +284,7 @@ LocationUpdateProtocol, GameTickProtocol {
             print("Current altitude is \(location.altitude)m")
             print("Bottom elevation translation is \(bottomElevation)")
             addWaterGeometry(world: sceneView.scene, initialPosition: bottomElevation)
-            addTerrainGeometry(world: sceneView.scene, initialPosition: bottomElevation)
+            //addTerrainGeometry(world: sceneView.scene, initialPosition: bottomElevation)
             assetsLoaded = true
         }
     }
@@ -358,7 +358,7 @@ LocationUpdateProtocol, GameTickProtocol {
     }
     
     func addTerrainGeometry(world: SCNScene, initialPosition: Double) {
-        /*let geometry = SCNScene(named: "art.scnassets/campus.dae")
+        let geometry = SCNScene(named: "art.scnassets/campus.dae")
         let node: SCNNode = (geometry?.rootNode.childNodes[0])!
         node.name = "terrain"
         
@@ -369,10 +369,10 @@ LocationUpdateProtocol, GameTickProtocol {
         //node.pivot = SCNMatrix4Mult(rotationMatrix, node.transform)
         
         // TODO: change scale of node to fit documentation
-        node.scale = SCNVector3(x: 1000.0, y: 1000.0, z: 1000.0)
+        node.scale = SCNVector3(x: 1.0, y: 1000.0, z: 1.0)
         node.position = SCNVector3Make(0.0, Float(initialPosition), 0.0)
         
-        world.rootNode.addChildNode(node)*/
+        world.rootNode.addChildNode(node)
     }
     
     func tickWater(increment: Float, elevationDelta: Float) {
@@ -487,14 +487,6 @@ LocationUpdateProtocol, GameTickProtocol {
     
     //MARK: - SKParticleEmitter
     func startRainEffect() {
-        /*var path = Bundle.main.path(forResource: "RainParticle", ofType: "sks")
-        var rainParticle = NSKeyedUnarchiver.unarchiveObject(withFile: path!) as! SKEmitterNode
-        
-        rainParticle.position = CGPoint(x: view.frame.width, y: view.frame.height)
-        rainParticle.name = "rainParticle"
-        rainParticle.targetNode
-        
-        sceneView.scene.addChild(rainParticle)*/
         let particle = SCNParticleSystem(named: "RainParticleSystem", inDirectory: nil)!
         sceneView.scene.rootNode.addParticleSystem(particle)
     }
