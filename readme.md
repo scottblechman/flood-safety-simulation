@@ -111,12 +111,26 @@ The primary coordination component of the application. Responsible for all logic
 Uses the Swift CoreLocation library to maintain real-time tracking of the user's geographic location and heading (compass orientation accessed through the device magnometer). Controls initialization and authorization of the device location system for the application, and sends regular location and heading updates to the view controller for synchronization (described below).
 
 #### Terrain Chunk Subsystem
+
+**Note:** our team originally used a system of model chunks to allow for a potentially complex elevation model to be rendered over the entire campus area without causing issues to memory or performance. The elevation model we created ultimately had a small enough poly count to be rendered as a single model without causing major issues, and because of the drawbacks of the added complexity, deprecated the chunk subsystem. The following explains how the system was originally designed and implemented.
+
 A "chunk" in the application represents a real-world area of elevation of approximately 528 sq. ft. A chunk is defined by its position in the overall terrain grid (0 ≤ x ≤ 6, 0 ≤ y ≤ 6), and contains information on the geographic coordinates and elevation of its "anchor point" (the top left corner of the chunk, used to align the chunk model in 3D space). The chunks themselves are simply references correlated to specific 3D models; the handling of the models themselved is performed by the view controller using the currently available chunk references.
 
 A chunk manager coordinates with the view controller to provide information on which chunks should and should not be shown in the world. When requested, the chunk manager can use the device's current location to provide the view controller with references to the selected chunks (4 ≤ x ≤ 9) that should be shown in the AR scene.
 
 #### Synchronizing the AR World
-The view controller maintains a collection of the chunks it is currently rendering in the AR scene, using the chunk references provided by the chunk manager. When the device's location is updated, the chunks needed are updated internally to reflect the new location, and the view controller creates terrain geometry to match the new list.
+The view controller maintains a collection of the chunks it is currently rendering in the AR scene, using the chunk references provided by the chunk manager. When the device's location is updated, the chunks needed are updated internally to reflect the new location, and the view controller creates terrain geometry to match the new list, as well as removing previously added geometry that is no longer in the user's field of vision.
+
+#### Current AR System
+As we are able to render the campus elevation model as a single unit, the AR system has been simplified. We are able to render a block representing water below the campus model, which is initialized to be anchored at the corner of campus in real-world coordinates and uses the elevation of the device to start at the proper ground level. The water model slowly rises in elevation as the game state ticks (explained more below), and overlaps the terrain model, creating the effect of pooling water rising from lower elevations to higher ones
+
+#### Creating the Game State
+To keep the view controller's concerns limited to reading subsystem states and rendering UI and the AR world, logic related to keeping track of the in-game world (such as the water elevation) and performing scoring is abstracted to a game manager. The game manager is primarily responsible for setting up a timer to run for the duration of the game. On a timer tick, total water elevation is updated, and the elevation at the user's location is compared to the water level to determine if the score should be subtracted from. These ticks are communicated to the view controller through a delegate, which both allows for the AR scene and user interface to be updated and for information such as the user's location to be passed to the game manager.
+
+#### User Interface and Effects
+The user interface consists of 4 primary elements: a button presented at the start to begin the game, a view at the top of the screen showing information during gameplay, a modal view at the end of the game to present the final score, and a button below it to reset the game state. Because Xcode's Interface Builder does not allow for these UIKit components to be statically placed in the same view as the AR scene view, all of these elements are programatically defined, and and shown and hidden in response to certain game events.
+
+Other audio and visual effects are also present to give the game a more realistic feel. A SceneKit particle system and core utility audio player are started and stopped together to provide the look and sound of heavy rain during gameplay.
 
 ### Division of Labor
 #### Fox
@@ -137,3 +151,5 @@ The view controller maintains a collection of the chunks it is currently renderi
 - Implement Gameplay
   - Create menus and transitions to and from gameplay
   - Implement gameplay logic from pseudocode
+
+[Video Demo Link](https://www.youtube.com/watch?v=9bk4JiERLMo&feature=youtu.be)
