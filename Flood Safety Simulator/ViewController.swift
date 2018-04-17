@@ -22,6 +22,7 @@ LocationUpdateProtocol, GameTickProtocol {
     
     var elevationDelta: Double = 0
     
+    
     // Current heading of the device
     var heading: CLLocationDirection? = nil
     
@@ -36,7 +37,7 @@ LocationUpdateProtocol, GameTickProtocol {
     // UI components programatically shown and hidden
     var labelTimer: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
     var labelScore: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
-    var gameEndLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
+    var gameEndLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 72))
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,7 +57,77 @@ LocationUpdateProtocol, GameTickProtocol {
         // Set the scene to the view
         sceneView.scene = scene
         
-        // Initialize game start UI
+        initializeGameStartInterface()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // Create a session configuration
+        let configuration = ARWorldTrackingConfiguration()
+        
+        // Enable plane detection
+        configuration.planeDetection = .horizontal
+
+        // Run the view's session
+        sceneView.session.run(configuration)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        //TODO: save the water model elevation here to prevent errors upon resuming
+        
+        // Pause the view's session
+        sceneView.session.pause()
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Release any cached data, images, etc that aren't in use.
+        // Might want to scale back model rendering here, if possible.
+    }
+    
+    // MARK: - View Touch Events
+    
+    // Called when the game start button is tapped. Ensures models are loaded, then begins the game
+    @objc func runGame(sender: UIButton!) {
+        print("Button tapped")
+        let children = scene.rootNode.childNodes.count
+        if children >= 1 {
+            print("Water and terrain available, starting game")
+            GameManager.Manager.startGame()
+            for view in self.view.subviews {
+                if view.tag == sender.tag {
+                    view.removeFromSuperview()
+                }
+            }
+            initializeGameInterface()
+        }
+    }
+    
+    // Called when the reset button is tapped after a game has ended.
+    @objc func resetGame(sender: UIButton!) {
+        print("Reset button tapped")
+        GameManager.Manager.startGame()
+        for view in self.view.subviews {
+            if view.tag == sender.tag {
+                view.removeFromSuperview()
+            }
+            else if view.tag == gameEndLabel.tag {
+                view.removeFromSuperview()
+            }
+        }
+        
+        initializeGameInterface()
+        let bottomElevation = GameManager.Manager.minElevationLevel - location!.altitude
+        resetWaterGeometry(world: sceneView.scene, initialPosition: bottomElevation)
+    }
+    
+    // MARK: - User Interface
+    
+    func initializeGameStartInterface() {
+        // Start button
         let button = UIButton(type: .custom)
         button.frame = CGRect(x: 0, y: 0, width: 150, height: 50)
         let _border = CAShapeLayer()
@@ -76,64 +147,64 @@ LocationUpdateProtocol, GameTickProtocol {
         button.center = self.view.center
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    func initializeGameEndInterface(_ score: String) {
+        // Game over information
+        /*gameEndLabel.lineBreakMode = .byWordWrapping // notice the 'b' instead of 'B'
+        gameEndLabel.numberOfLines = 0
+        gameEndLabel.text = "GAME OVER\n\nYour score is "+score
+        gameEndLabel.textAlignment = NSTextAlignment.center
+        gameEndLabel.tag = 201
         
-        // Create a session configuration
-        let configuration = ARWorldTrackingConfiguration()
+        let labelBorder = CAShapeLayer()
+        labelBorder.path = UIBezierPath(roundedRect: gameEndLabel.bounds, cornerRadius:gameEndLabel.frame.size.width/2).cgPath
+        labelBorder.frame = gameEndLabel.bounds
+        labelBorder.strokeColor = UIColor.white.cgColor
+        labelBorder.fillColor = UIColor.white.cgColor
+        labelBorder.lineWidth = 3.0
+        gameEndLabel.layer.addSublayer(labelBorder)
+        gameEndLabel.textColor = UIColor.black
         
-        // Enable plane detection
-        configuration.planeDetection = .horizontal
-
-        // Run the view's session
-        sceneView.session.run(configuration)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
+        self.view.addSubview(gameEndLabel)
+        gameEndLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // Pause the view's session
-        sceneView.session.pause()
+        gameEndLabel.heightAnchor.constraint(equalToConstant: 96).isActive = true
+        gameEndLabel.widthAnchor.constraint(equalToConstant: 96).isActive = true
+        gameEndLabel.centerXAnchor.constraint(equalTo: gameEndLabel.superview!.centerXAnchor).isActive = true
+        gameEndLabel.topAnchor.constraint(equalTo: gameEndLabel.superview!.topAnchor).isActive = true*/
+        
+        // Reset button
+        let resetButton = UIButton(type: .custom)
+        resetButton.frame = CGRect(x: 0, y: 0, width: 150, height: 50)
+        let _border = CAShapeLayer()
+        _border.path = UIBezierPath(roundedRect: resetButton.bounds, cornerRadius:resetButton.frame.size.width/2).cgPath
+        _border.frame = resetButton.bounds
+        _border.strokeColor = UIColor.white.cgColor
+        _border.fillColor = UIColor.white.cgColor
+        _border.lineWidth = 3.0
+        resetButton.layer.addSublayer(_border)
+        resetButton.setTitleColor(UIColor.black, for: .normal)
+        
+        resetButton.setTitle("TRY AGAIN", for: .normal)
+        resetButton.addTarget(self, action: #selector(resetGame(sender:)), for: .touchUpInside)
+        resetButton.tag = 202
+        
+        self.view.addSubview(resetButton)
+        resetButton.center = self.view.center
+        /*resetButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        resetButton.heightAnchor.constraint(equalToConstant: 96).isActive = true
+        resetButton.widthAnchor.constraint(equalToConstant: 96).isActive = true
+        resetButton.centerXAnchor.constraint(equalTo: resetButton.superview!.centerXAnchor).isActive = true
+        resetButton.bottomAnchor.constraint(equalTo: resetButton.superview!.bottomAnchor).isActive = true*/
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Release any cached data, images, etc that aren't in use.
-        // Might want to scale back model rendering here, if possible.
-    }
-    
-    // MARK: - UserInterface
-    
-    @objc func runGame(sender: UIButton!) {
-        print("Button tapped")
-        let children = scene.rootNode.childNodes.count
-        if children >= 1 {
-            print("Water and terrain available, starting game")
-            GameManager.Manager.startGame()
-            for view in self.view.subviews {
-                if view.tag == sender.tag {
-                    view.removeFromSuperview()
-                }
-            }
-            initializeGameInterface()
-        }
-    }
-    
-    @objc func resetGame(sender: UIButton!) {
-        print("Reset button tapped")
-        GameManager.Manager.startGame()
-        for view in self.view.subviews {
-            if view.tag == sender.tag {
-                view.removeFromSuperview()
-            }
-            else if view.tag == gameEndLabel.tag {
-                view.removeFromSuperview()
-            }
-        }
-        initializeGameInterface()
-    }
-    
+    // Programatically creates and styles the labels that need to appear as a game overlay,
+    // and adds them to the game view.
     func initializeGameInterface() {
+        let testView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height/10))
+        testView.backgroundColor = UIColor.white
+        self.view.addSubview(testView)
+        
         labelTimer.center = CGPoint(x: 96, y: 96)
         labelTimer.textAlignment = .center
         labelTimer.tag = 102
@@ -215,6 +286,7 @@ LocationUpdateProtocol, GameTickProtocol {
         
         if assetsLoaded == false && heading != nil {
             let bottomElevation = GameManager.Manager.minElevationLevel - location.altitude
+            print("Current altitude is \(location.altitude)m")
             print("Bottom elevation translation is \(bottomElevation)")
             addWaterGeometry(world: sceneView.scene, initialPosition: bottomElevation)
             addTerrainGeometry(world: sceneView.scene, initialPosition: bottomElevation)
@@ -244,24 +316,7 @@ LocationUpdateProtocol, GameTickProtocol {
     // Called automatically when the game manager has determined the game should end.
     func gameEnded(score: String) {
         removeGameInterface()
-        
-        gameEndLabel.text = "Game Over Score: "+score
-        gameEndLabel.tag = 201
-        self.view.addSubview(gameEndLabel)
-        gameEndLabel.center = self.view.center
-        
-        let resetButton = UIButton(frame: CGRect(x: 0, y: 0, width: 150, height: 100))
-        resetButton.setTitle("TRY AGAIN", for: .normal)
-        resetButton.addTarget(self, action: #selector(resetGame(sender:)), for: .touchUpInside)
-        resetButton.tag = 202
-        
-        self.view.addSubview(resetButton)
-        resetButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        resetButton.heightAnchor.constraint(equalToConstant: 96).isActive = true
-        resetButton.widthAnchor.constraint(equalToConstant: 96).isActive = true
-        resetButton.centerXAnchor.constraint(equalTo: resetButton.superview!.centerXAnchor).isActive = true
-        resetButton.bottomAnchor.constraint(equalTo: resetButton.superview!.bottomAnchor).isActive = true
+        initializeGameEndInterface(score)
     }
     
     // MARK: - ARSCNViewManager
@@ -299,6 +354,12 @@ LocationUpdateProtocol, GameTickProtocol {
         node.position = SCNVector3Make(0.0, Float(initialPosition)*10, 0.0)
         
         world.rootNode.addChildNode(node)
+    }
+    
+    func resetWaterGeometry(world: SCNScene, initialPosition: Double) {
+        let node = scene.rootNode.childNode(withName: "water", recursively: true)
+        node?.position = SCNVector3Make(0.0, Float(initialPosition)*10, 0.0)
+        
     }
     
     func addTerrainGeometry(world: SCNScene, initialPosition: Double) {
