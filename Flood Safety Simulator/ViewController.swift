@@ -37,7 +37,9 @@ LocationUpdateProtocol, GameTickProtocol {
     // UI components programatically shown and hidden
     var labelTimer: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
     var labelScore: UILabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 21))
-    var gameEndLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 200, height: 72))
+    var gameEndLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 128, height: 128))
+    
+    var gameLabelBackgroundView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -149,13 +151,22 @@ LocationUpdateProtocol, GameTickProtocol {
     
     func initializeGameEndInterface(_ score: String) {
         // Game over information
-        /*gameEndLabel.lineBreakMode = .byWordWrapping // notice the 'b' instead of 'B'
+        let scoreModal = UIView(frame: CGRect(x: 72, y: 72, width: view.frame.width / 1.5, height: view.frame.height / 4 ))
+        scoreModal.layer.cornerRadius = 8
+        scoreModal.backgroundColor = UIColor.white
+        self.view.addSubview(scoreModal)
+        
+        gameEndLabel = UILabel(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 128))
+        gameEndLabel.lineBreakMode = .byWordWrapping
         gameEndLabel.numberOfLines = 0
         gameEndLabel.text = "GAME OVER\n\nYour score is "+score
         gameEndLabel.textAlignment = NSTextAlignment.center
-        gameEndLabel.tag = 201
+        gameEndLabel.tag =  201
         
-        let labelBorder = CAShapeLayer()
+        scoreModal.addSubview(gameEndLabel)
+        gameEndLabel.center = CGPoint(x: view.frame.width / 2 - 72, y: view.frame.height / 2 - 272)
+        
+        /*let labelBorder = CAShapeLayer()
         labelBorder.path = UIBezierPath(roundedRect: gameEndLabel.bounds, cornerRadius:gameEndLabel.frame.size.width/2).cgPath
         labelBorder.frame = gameEndLabel.bounds
         labelBorder.strokeColor = UIColor.white.cgColor
@@ -201,9 +212,9 @@ LocationUpdateProtocol, GameTickProtocol {
     // Programatically creates and styles the labels that need to appear as a game overlay,
     // and adds them to the game view.
     func initializeGameInterface() {
-        let testView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height/10))
-        testView.backgroundColor = UIColor.white
-        self.view.addSubview(testView)
+        gameLabelBackgroundView = UIView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height/10))
+        gameLabelBackgroundView.backgroundColor = UIColor.white
+        self.view.addSubview(gameLabelBackgroundView)
         
         labelTimer.center = CGPoint(x: 96, y: 96)
         labelTimer.textAlignment = .center
@@ -233,6 +244,7 @@ LocationUpdateProtocol, GameTickProtocol {
     func removeGameInterface() {
         labelTimer.removeFromSuperview()
         labelScore.removeFromSuperview()
+        gameLabelBackgroundView.removeFromSuperview()
     }
 
     // MARK: - ARSCNViewDelegate
